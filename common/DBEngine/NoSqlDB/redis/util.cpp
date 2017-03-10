@@ -54,7 +54,7 @@ namespace goddard
 				0x6e17,0x7e36,0x4e55,0x5e74,0x2e93,0x3eb2,0x0ed1,0x1ef0
 		};
 
-		uint16_t crc16(const char *buf, int len) {
+		uint16_t keyHashSlot(const char *buf, int len) {
 				int counter;
 				uint16_t crc = 0;
 				for (counter = 0; counter < len; counter++)

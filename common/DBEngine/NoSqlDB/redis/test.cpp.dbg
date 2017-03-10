@@ -1,0 +1,7 @@
+#include "redisManager.h"
+
+using namespace goddard;
+
+int main()
+{
+}
