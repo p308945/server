@@ -206,20 +206,24 @@ namespace goddard
 														}
 														else
 														{
-																std::ostringstream oss;
-																oss << "master node is NULL slave ip: " << ip << ", port: " << port;
-																print_error(oss.str());
-																goto err;
+																std::cout << "slave already connected ip: " << ip << ", port: " << port << ", slave count: " << getSlaveCount() << std::endl;
 														}
 
 												}
-
+												else
+												{
+														std::ostringstream oss;
+														oss << "master node is NULL slave ip: " << ip << ", port: " << port;
+														print_error(oss.str());
+														goto err;
+												}
 										}
 								}
 						}
 
 				}
 				mCluster.online();
+				return true;
 err:
 				mCluster.reset();
 				return false;
@@ -251,6 +255,9 @@ err:
 				RedisClusterNode *node = mCluster.getClusterNodeBySlotIdx(slotIdx);
 				if (NULL == node)
 				{
+						std::ostringstream oss;
+						oss << "getClusterNodeBySlotIdx return NULL, key:" << key << ", slotIdx:" << slotIdx;
+						print_error(oss.str());
 						return NULL;
 				}
 				return node;
