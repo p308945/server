@@ -9,7 +9,51 @@ int main()
 		ret = redisService.init();
 		std::cout << "start ret:" << ret << std::endl;
 
+		/* key */
 		int64_t delCnt = 0;
 		ret = redisService.delKey("123", delCnt);
 		std::cout << ret << ", delCnt:" << delCnt << std::endl;
+
+		int64_t exists = 2;
+		ret = redisService.existsKey("123", exists);
+		std::cout << ret << ", exists:" << exists << std::endl;
+
+		bool setSucc = false;
+		ret = redisService.expireKey("321", 1000, setSucc);
+		std::cout << ret << ", setSucc:" << setSucc << std::endl;
+		int64_t ttl = 0;
+		ret = redisService.ttlKey("321", ttl);
+		std::cout << ret << ", ttl:" << ttl << std::endl;
+
+		std::string typeStr;
+		enum KEYTYPE type;
+		ret = redisService.typeKey("321", typeStr, type);
+		std::cout << ret << ", typeStr:" << typeStr << ", type:" << type << std::endl;
+
+		/* end key */
+
+		/* string */
+		int64_t res;
+		ret = redisService.decrString("321", &res);
+		std::cout << ret << ", res:" << res << std::endl;
+		ret = redisService.decrByString("321", 300, &res);
+		std::cout << ret << ", res:" << res << std::endl;
+
+		ret = redisService.incrString("321", &res);
+		std::cout << ret << ", res:" << res << std::endl;
+		ret = redisService.incrByString("321", 200, &res);
+		std::cout << ret << ", res:" << res << std::endl;
+
+		ret = redisService.setString(std::make_pair("123", "1000"));
+		std::cout << ret << std::endl;
+
+		std::string str;
+		ret = redisService.getString("123", str);
+		std::cout << ret << ", str:" << str << std::endl;
+
+		str.clear();
+		ret = redisService.getString("test123", str);
+		std::cout << ret << ", str:" << str << std::endl;
+
+		/* end string */
 }

@@ -16,7 +16,9 @@
  * =====================================================================================
  */
 
+#include <sys/time.h>
 #include "util.h"
+
 namespace goddard
 {
 		static const uint16_t crc16tab[256]= {
@@ -64,7 +66,7 @@ namespace goddard
 
 		uint32_t keyHashSlot(const char *key, int keylen)
 		{
-				uint32_t s, e;
+				int s, e;
 				for (s = 0; s < keylen; ++s)
 						if (key[s] == '{') break;
 				if (s == keylen) return crc16(key, keylen) & SLOT_MAX_MASK;
@@ -73,5 +75,18 @@ namespace goddard
 						if (key[e] == '}') break;
 				if (e == keylen || e == s + 1) return crc16(key, keylen) & SLOT_MAX_MASK;
 				return crc16(key + s, e - s) &SLOT_MAX_MASK;
+		}
+
+		bool getNowMs(uint64_t &ms)
+		{
+				struct timeval tv = {0, 0};
+				if (0 != gettimeofday(&tv, NULL))
+				{
+						return false;
+				}
+				ms = 0;
+				ms += tv.tv_sec * 1000;
+				ms += tv.tv_usec / 1000;
+				return true;
 		}
 }

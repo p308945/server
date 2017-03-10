@@ -51,7 +51,54 @@ namespace goddard
 
 						/* key */
 						bool delKey(const char *key, int64_t &delCnt);
+						bool existsKey(const char *key, int64_t &exists);	//0 exists, 1 not exists, 2 error
+						bool expireKey(const char *key, const uint64_t sec, bool &setSucc)
+						{
+								return pexpireKey(key, sec * 1000, setSucc);
+						}
+
+						bool expireAtKey(const char *key, const uint64_t sec, bool &setSucc)
+						{
+								return pexpireAtKey(key, sec * 1000, setSucc);
+						}
+						bool pexpireKey(const char *key, uint64_t ms, bool &setSucc);
+						bool pexpireAtKey(const char *key, const uint64_t ms, bool &setSucc);
+						bool ttlKey(const char *key, int64_t &ttl)	//ttl -1 no ttl, permanent key; -2 key does not exists, positive ttl time
+						{
+								if (!pttlKey(key, ttl))
+										return false;
+								if (ttl > 0)
+								{
+										if (ttl < 1000)
+												ttl = 1;
+										else
+												ttl /= 1000;
+
+								}
+								return true;
+						}
+
+						bool pttlKey(const char *key, int64_t &pttl);	//ttl -1 no ttl, permanent key; -2 key does not exists, positive ttl time
+						bool typeKey(const char *key, std::string &typeStr, enum KEYTYPE &type);
 						/* end key */
+
+						/* string */
+						bool decrString(const char *key, int64_t *rtn = NULL)
+						{
+								return incrByString(key, -1, rtn);
+						}
+						bool decrByString(const char *key, const int64_t by, int64_t *rtn = NULL)
+						{
+								return incrByString(key, -by, rtn);
+						}
+						bool getString(const char *key, std::string &value);
+						bool incrString(const char *key, int64_t *rtn = NULL)
+						{
+								return incrByString(key, 1, rtn);
+						}
+						bool incrByString(const char *key, const int64_t by, int64_t *rtn = NULL);
+						bool setString(const kvPairType &kvPair);
+						/* end string */
 
 				private:
 						RedisManager() {}

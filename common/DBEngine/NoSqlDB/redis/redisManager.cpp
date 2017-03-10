@@ -195,6 +195,8 @@ err:
 						break;\
 				}\
 		}
+
+		/* key */
 		bool RedisManager::delKey(const char *key, int64_t &delCnt)
 		{
 				redisReply *reply = _component.fireCmd(key, DEL_KEY_FORMAT, key);
@@ -210,5 +212,160 @@ err:
 				freeReplyObject(reply);
 				return ret;
 		}
+
+		bool RedisManager::existsKey(const char *key, int64_t &exists)	//0 exists, 1 not exists, 2 error
+		{
+				redisReply *reply = _component.fireCmd(key, EXISTS_KEY_FORMAT, key);
+				bool ret = false;
+				if (!reply)
+				{
+						return ret;
+				}
+				exists = 2;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						int64_t num = -1;
+						MACRO_REPLY_GET_INT64(reply, num);
+						if (num > 0)
+						{
+								exists = 0;
+						}
+						else if (0 == num)
+						{
+								exists = 1;
+						}
+						else
+						{
+								exists = 2;
+						}
+				}
+				if (reply)
+				{
+						freeReplyObject(reply);
+				}
+				return ret;
+		}
+
+		bool RedisManager::pexpireKey(const char *key, uint64_t ms, bool &setSucc)
+		{
+				uint64_t nowms = 0;
+				if (!getNowMs(nowms))
+				{
+						return false;
+				}
+				ms += nowms;
+				return pexpireAtKey(key, ms, setSucc);
+		}
+
+		bool RedisManager::pexpireAtKey(const char *key, const uint64_t ms, bool &setSucc)
+		{
+				redisReply *reply = _component.fireCmd(key, PEXPIRE_AT_KEY_FORMAT, key, ms);
+				bool ret = false;
+				if (!ret)
+					return ret;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						int64_t res = 0;
+						MACRO_REPLY_GET_INT64(reply, res);
+						if (res > 0)
+						{
+								setSucc = true;
+						}
+
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::pttlKey(const char *key, int64_t &pttl)
+		{
+				redisReply *reply = _component.fireCmd(key, PTTL_KEY_FORMAT, key);
+				bool ret = false;
+				if (!reply)
+					return ret;
+				MACRO_REPLY_GET_INT64_RET(reply, pttl, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::typeKey(const char *key, std::string &typeStr,enum KEYTYPE &type)
+		{
+				redisReply *reply = _component.fireCmd(key, TYPE_KEY_FORMAT, key);
+				if (!reply)
+						return false;
+
+				bool ret = false;
+				MACRO_REPLY_GET_STRING_RET(reply, typeStr, ret);
+				if (ret)
+				{
+						if (!strcasecmp(KEY_TYPE_STR_NONE, typeStr.c_str()))
+								type = eNone;
+						else if (!strcasecmp(KEY_TYPE_STR_STRING, typeStr.c_str()))
+								type = eString;
+						else if (!strcasecmp(KEY_TYPE_STR_LIST, typeStr.c_str()))
+								type = eList;
+						else if (!strcasecmp(KEY_TYPE_STR_SET, typeStr.c_str()))
+								type = eSet;
+						else if (!strcasecmp(KEY_TYPE_STR_ZSET, typeStr.c_str()))
+								type = eZSet;
+						else if (!strcasecmp(KEY_TYPE_STR_HASH, typeStr.c_str()))
+								type = eHash;
+						else
+						{
+								std::ostringstream oss;
+								oss << "typeStr:" << typeStr;
+								print_error(typeStr.c_str());
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		/* end key */
+
+		/* string */
+
+		bool RedisManager::getString(const char *key, std::string &value)
+		{
+				redisReply *reply = _component.fireCmd(key, GET_STRING_FORMAT, key);
+				if (!reply)
+						return false;
+				bool ret = false;
+				MACRO_REPLY_GET_STRING_RET(reply, value, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::incrByString(const char *key, const int64_t by, int64_t *rtn)
+		{
+				redisReply *reply = _component.fireCmd(key, INCRBY_STRING_FORMAT, key, by);
+				if (!reply)
+						return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						MACRO_REPLY_GET_INT64PTR_RET(reply, rtn, ret);
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::setString(const kvPairType &kvPair)
+		{
+				const std::string &key = kvPair.first;
+				const std::string &value = kvPair.second;
+				redisReply *reply = _component.fireCmd(key.c_str(), SET_STRING_FORMAT, key.c_str(), value.c_str(), value.length());
+				if (!reply)
+						return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+						ret = true;
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		/* end string */
 
 }
