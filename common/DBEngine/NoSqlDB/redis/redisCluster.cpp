@@ -107,7 +107,13 @@ namespace goddard
 						print_error(oss.str());
 						return false;
 				}
-				clusterRefreshFromReply(reply);
+				if (!clusterRefreshFromReply(reply))
+				{
+						std::ostringstream oss;
+						oss << "clusterRefreshFromReply return false";
+						print_error(oss.str());
+						return false;
+				}
 				freeReplyObject(reply);
 				return true;
 		}

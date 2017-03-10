@@ -8,4 +8,8 @@ int main()
 		bool ret = false;
 		ret = redisService.init();
 		std::cout << "start ret:" << ret << std::endl;
+
+		int64_t delCnt = 0;
+		ret = redisService.delKey("123", delCnt);
+		std::cout << ret << ", delCnt:" << delCnt << std::endl;
 }

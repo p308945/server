@@ -49,6 +49,10 @@ namespace goddard
 						bool update();
 						bool fini();
 
+						/* key */
+						bool delKey(const char *key, int64_t &delCnt);
+						/* end key */
+
 				private:
 						RedisManager() {}
 						RedisManager(const RedisManager &) = delete;

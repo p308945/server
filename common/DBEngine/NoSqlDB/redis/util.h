@@ -27,7 +27,7 @@
 namespace goddard
 {
 		const uint32_t SLOT_MAX_MASK = 16383;
-		uint16_t keyHashSlot(const char *key, int keylen);
+		uint32_t keyHashSlot(const char *key, int keylen);
 		bool getNowMs(uint64_t &ms);
 
 #define print_error(err)	\

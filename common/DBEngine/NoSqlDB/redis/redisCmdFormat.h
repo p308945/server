@@ -22,7 +22,7 @@
 namespace goddard
 {
 /* keys */
-//#define DEL_KEY_FORMAT "DEL %s"
+#define DEL_KEY_FORMAT "DEL %s"
 //#define EXISTS_KEY_FORMAT "EXISTS %s"
 //#define EXPIRE_KEY_FORMAT "EXPIRE %s %u"
 //#define EXPIRE_AT_KEY_FORMAT "EXPIREAT %s %u"

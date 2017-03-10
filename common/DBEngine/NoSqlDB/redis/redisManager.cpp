@@ -20,6 +20,7 @@
 #include "redisClusterProcess.h"
 #include "redisCluster.h"
 #include "redisSingle.h"
+#include "redisCmdFormat.h"
 
 namespace goddard
 {
@@ -193,6 +194,21 @@ err:
 												}\
 						break;\
 				}\
+		}
+		bool RedisManager::delKey(const char *key, int64_t &delCnt)
+		{
+				redisReply *reply = _component.fireCmd(key, DEL_KEY_FORMAT, key);
+				bool ret = false;
+				if (!ret)
+				{
+						return ret;
+				}
+				if (REDIS_REPLY_ERROR != reply->type)
+				{
+						MACRO_REPLY_GET_INT64_RET(reply, delCnt, ret);
+				}
+				freeReplyObject(reply);
+				return ret;
 		}
 
 }
