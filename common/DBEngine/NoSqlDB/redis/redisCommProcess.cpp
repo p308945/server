@@ -38,27 +38,27 @@ namespace goddard
 				}
 				if (REDIS_REPLY_ERROR == reply->type)
 				{
-						if ((int)strlen(REDIS_ERR_MOVED_STR) <= reply->len &&
+						if (strlen(REDIS_ERR_MOVED_STR) <= reply->len &&
 										0 == strncasecmp(reply->str, REDIS_ERR_MOVED_STR, strlen(REDIS_ERR_MOVED_STR)))
 						{
 								return REPLY_CLUSTER_ERR_MOVED;
 						}
-						else if ((int)strlen(REDIS_ERR_ASK_STR) <= reply->len &&
+						else if (strlen(REDIS_ERR_ASK_STR) <= reply->len &&
 										0 == strncasecmp(reply->str, REDIS_ERR_ASK_STR, strlen(REDIS_ERR_ASK_STR)))
 						{
 								return REPLY_CLUSTER_ERR_ASK;
 						}
-						else if ((int)strlen(REDIS_ERR_TRYAGAIN_STR) <= reply->len &&
+						else if (strlen(REDIS_ERR_TRYAGAIN_STR) <= reply->len &&
 										0 == strncasecmp(reply->str, REDIS_ERR_TRYAGAIN_STR, strlen(REDIS_ERR_TRYAGAIN_STR)))
 						{
 								return REPLY_ERR_TRYAGAIN;
 						}
-						else if ((int)strlen(REDIS_ERR_CROSSSLOT_STR) <= reply->len &&
+						else if (strlen(REDIS_ERR_CROSSSLOT_STR) <= reply->len &&
 										0 == strncasecmp(reply->str, REDIS_ERR_CROSSSLOT_STR, strlen(REDIS_ERR_CROSSSLOT_STR)))
 						{
 								return REPLY_CLUSTER_ERR_CROSSSLOT;
 						}
-						else if ((int)strlen(REDIS_ERR_CLUSTERDOWN_STR) <= reply->len &&
+						else if (strlen(REDIS_ERR_CLUSTERDOWN_STR) <= reply->len &&
 										0 == strncasecmp(reply->str, REDIS_ERR_CLUSTERDOWN_STR, strlen(REDIS_ERR_CLUSTERDOWN_STR)))
 						{
 								return REPLY_CLUSTER_ERR_CLUSTERDOWN;

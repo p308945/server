@@ -100,6 +100,18 @@ namespace goddard
 						bool setString(const kvPairType &kvPair);
 						/* end string */
 
+						/* hash */
+						bool hdelHash(const char *key, const char *field);
+						bool hexistsHash(const char *key, const char *field, bool &exists);
+						bool hgetHash(const char *key, const char *field, std::string &value);
+						bool hgetallHash(const char *key, kvPairVecType &fieldValueVec /* field value */);
+						bool hkeysHash(const char *key, stringVecType &fieldVec);
+						bool hlenHash(const char *key, int64_t &len);
+						bool hsetHash(const char *key, const char *field, const std::string &value);
+						bool hvalsHash(const char *key, stringVecType &valueVec);
+						bool hstrlenHash(const char *key, const char *field, int64_t &len);
+						/* end hash */
+
 				private:
 						RedisManager() {}
 						RedisManager(const RedisManager &) = delete;

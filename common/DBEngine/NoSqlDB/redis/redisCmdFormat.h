@@ -61,21 +61,22 @@ namespace goddard
 /* end string */
 
 /* hash */
-//#define HDEL_HASH_FORMAT "HDEL %s %s"
-//#define HEXISTS_HASH_FORMAT "HEXISTS %s %s"
-//#define HGETALL_HASH_FORMAT "HGETALL %s"
+#define HDEL_HASH_FORMAT "HDEL %s %s"
+#define HEXISTS_HASH_FORMAT "HEXISTS %s %s"
+#define HGET_HASH_FORMAT "HGET %s %s"
+#define HGETALL_HASH_FORMAT "HGETALL %s"
 //#define HINCRBY_HASH_FORMAT "HINCRBY %s %s %llu"
 //#define HINCRBYFLOAT_HASH_FORMAT "HINCRBYFLOAT %s %s %lf"
-//#define HKEYS_HASH_FORMAT "HKEYS %s"
-//#define HLEN_HASH_FORMAT "HLEN %s"
+#define HKEYS_HASH_FORMAT "HKEYS %s"
+#define HLEN_HASH_FORMAT "HLEN %s"
 //#define HMGET_HASH_FORMAT "HMGET %s"
 //#define HMGET_HASH_FORMAT_PART " %s"
 //#define HMSET_HASH_FORMAT "HMSET %s"
 //#define HMSET_HASH_FORMAT_PART " %s"
-//#define HSET_HASH_FORMAT "HSET %s %s %b"
+#define HSET_HASH_FORMAT "HSET %s %s %b"
 //#define HSETNX_HASH_FORMAT "HSETNX %s %s %b"
-//#define HVALS_HASH_FORMAT "HVALS %s"
-//#define HSTRLEN_HASH_FORMAT "HSTRLEN %s %s"
+#define HVALS_HASH_FORMAT "HVALS %s"
+#define HSTRLEN_HASH_FORMAT "HSTRLEN %s %s"
 /* end hash */
 
 /* list */

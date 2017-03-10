@@ -35,13 +35,12 @@ namespace goddard
 				eHash,
 		};
 
-		static const char *KEY_TYPE_STR_NONE = "none";
-		static const char *KEY_TYPE_STR_STRING = "string";
-		static const char *KEY_TYPE_STR_LIST = "list";
-		static const char *KEY_TYPE_STR_SET = "set";
-		static const char *KEY_TYPE_STR_ZSET = "zset";
-		static const char *KEY_TYPE_STR_HASH = "hash";
-
+#define KEY_TYPE_STR_NONE "none"
+#define KEY_TYPE_STR_STRING "string"
+#define KEY_TYPE_STR_LIST "list"
+#define KEY_TYPE_STR_SET "set"
+#define KEY_TYPE_STR_ZSET "zset"
+#define KEY_TYPE_STR_HASH "hash"
 
 		class RedisCommon
 		{

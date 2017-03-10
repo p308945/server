@@ -56,4 +56,70 @@ int main()
 		std::cout << ret << ", str:" << str << std::endl;
 
 		/* end string */
+
+		/* hash */
+		bool bExists = false;
+		ret = redisService.hsetHash("h", "123", "xxxx");
+		std::cout << ret << std::endl;
+		ret = redisService.hexistsHash("h", "123", bExists);
+		std::cout << ret << ", exists:" << bExists << std::endl;
+
+		ret = redisService.hexistsHash("h", "321", bExists);
+		std::cout << ret << ", exists:" << bExists << std::endl;
+
+		ret = redisService.hexistsHash("h1", "123", bExists);
+		std::cout << ret << ", exists:" << bExists << std::endl;
+
+		ret = redisService.hgetHash("h", "123", str);
+		std::cout << ret << ", str:" << str << std::endl;
+
+		ret = redisService.hdelHash("h", "123");
+		std::cout << ret << std::endl;
+
+		ret = redisService.hexistsHash("h", "123", bExists);
+		std::cout << ret << ", exists:" << bExists << std::endl;
+
+		for (auto i = 0; i < 100; ++i)
+		{
+				std::ostringstream oss;
+				oss << i << " field";
+				std::string field = oss.str();
+				oss.str("");
+				oss << i << " value";
+				ret = redisService.hsetHash("h", field.c_str(), oss.str());
+		}
+
+		kvPairVecType fieldValueVec;
+		ret = redisService.hgetallHash("h", fieldValueVec);
+		for (uint32_t i = 0; i < fieldValueVec.size(); ++i)
+		{
+				std::cout << "field: " << fieldValueVec[i].first;
+				std::cout << ", value: " << fieldValueVec[i].second;
+
+				int64_t len = 0;
+				ret = redisService.hstrlenHash("h", fieldValueVec.at(i).first.c_str(), len);
+				std::cout << " , ret: " << ret << ", len:" << len << std::endl;
+				std::cout << std::endl;
+		}
+
+		stringVecType fieldVec;
+		ret = redisService.hkeysHash("h", fieldVec);
+		std::cout << ret << ", fieldSize: " << fieldVec.size() << std::endl;
+		for (uint32_t i = 0; i < fieldVec.size(); ++i)
+		{
+				std::cout << "field: " << fieldVec[i] << std::endl;
+		}
+
+		int64_t len = 0;
+		ret = redisService.hlenHash("h", len);
+		std::cout << ret << ", hlen: " << len << std::endl;
+
+		stringVecType valueVec;
+		ret = redisService.hvalsHash("h", valueVec);
+		std::cout << ret << "; valueVec Size:" << valueVec.size() << std::endl;
+		for (uint32_t i = 0; i < valueVec.size(); ++i)
+				std::cout << valueVec[i] << std::endl;
+
+
+		/* end hash */
 }

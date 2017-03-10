@@ -21,6 +21,7 @@
 #include "redisCluster.h"
 #include "redisSingle.h"
 #include "redisCmdFormat.h"
+#include "mathUtil.h"
 
 namespace goddard
 {
@@ -367,5 +368,168 @@ err:
 		}
 
 		/* end string */
+
+		/* hash */
+		bool RedisManager::hdelHash(const char *key, const char *field)
+		{
+				redisReply *reply = _component.fireCmd(key, HDEL_HASH_FORMAT, key, field);
+				if (!reply)
+						return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+						ret = true;
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::hexistsHash(const char *key, const char *field, bool &exists)
+		{
+				redisReply *reply = _component.fireCmd(key, HEXISTS_HASH_FORMAT, key, field);
+				if (!reply)
+						return false;
+				bool ret = false;
+				int64_t num = 0;
+				MACRO_REPLY_GET_INT64_RET(reply, num, ret);
+				if (num > 0)
+						exists = true;
+				else
+						exists = false;
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::hgetHash(const char *key, const char *field, std::string &value)
+		{
+				redisReply *reply = _component.fireCmd(key, HGET_HASH_FORMAT, key, field);
+				if (!reply)
+						return false;
+				bool ret = false;
+				MACRO_REPLY_GET_STRING_RET(reply, value, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::hgetallHash(const char *key, kvPairVecType &fieldValueVec /* field value */)
+		{
+				redisReply *reply = _component.fireCmd(key, HGETALL_HASH_FORMAT, key);
+				if (!reply)
+						return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						if (reply->type == REDIS_REPLY_ARRAY)
+						{
+								if (reply->elements > 0 && iseven(reply->elements))
+								{
+										fieldValueVec.reserve(reply->elements / 2);
+										for (uint32_t i = 0; i < reply->elements; i += 2)
+										{
+												std::string field;
+												std::string value;
+												MACRO_REPLY_GET_STRING(reply->element[i], field);
+												MACRO_REPLY_GET_STRING(reply->element[i + 1], value);
+												fieldValueVec.emplace_back(field, value);
+										}
+
+								}
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::hkeysHash(const char *key, stringVecType &fieldVec)
+		{
+				redisReply *reply = _component.fireCmd(key, HKEYS_HASH_FORMAT, key);
+				if (!reply)
+						return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						if (reply->type == REDIS_REPLY_ARRAY)
+						{
+								if (reply->elements > 0)
+								{
+										fieldVec.reserve(reply->elements);
+										for (uint32_t i = 0; i < reply->elements; ++i)
+										{
+												std::string field;
+												bool data = false;
+												MACRO_REPLY_GET_STRING_RET(reply->element[i], field, data);
+												if (data)
+														fieldVec.push_back(field);
+										}
+								}
+						}
+
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::hlenHash(const char *key, int64_t &len)
+		{
+				redisReply *reply = _component.fireCmd(key, HLEN_HASH_FORMAT, key);
+				if (!reply)
+						return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, len, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::hsetHash(const char *key, const char *field, const std::string &value)
+		{
+				redisReply *reply = _component.fireCmd(key, HSET_HASH_FORMAT, key, field, value.c_str(), value.length());
+				if (!reply)
+						return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+						ret = true;
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::hvalsHash(const char *key, stringVecType &valueVec)
+		{
+				redisReply *reply = _component.fireCmd(key, HVALS_HASH_FORMAT, key);
+				if (!reply)
+						return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						if (reply->type == REDIS_REPLY_ARRAY)
+						{
+								if (reply->elements > 0)
+								{
+										valueVec.reserve(reply->elements);
+										for (uint32_t i = 0; i < reply->elements; ++i)
+										{
+												std::string value;
+												MACRO_REPLY_GET_STRING(reply->element[i], value);
+												valueVec.push_back(value);
+										}
+								}
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::hstrlenHash(const char *key, const char *field, int64_t &len)
+		{
+				redisReply *reply = _component.fireCmd(key, HSTRLEN_HASH_FORMAT, key, field);
+				if (!reply)
+						return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, len, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		/* end hash */
 
 }
