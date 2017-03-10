@@ -4,4 +4,8 @@ using namespace goddard;
 
 int main()
 {
+		RedisManager &redisService = RedisManager::getInstance();
+		bool ret = false;
+		ret = redisService.init();
+		std::cout << "start ret:" << ret << std::endl;
 }
