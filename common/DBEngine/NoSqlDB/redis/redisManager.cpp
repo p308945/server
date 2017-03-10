@@ -93,4 +93,106 @@ err:
 				}
 				return false;
 		}
+
+#define MACRO_REPLY_GET_INT64(reply, res)\
+		if (reply->type != REDIS_REPLY_ERROR) \
+		{	\
+				switch(reply->type)\
+				{	\
+						case REDIS_REPLY_INTEGER:	\
+													{	\
+															res = reply->integer;	\
+													}	\
+						break;	\
+						case REDIS_REPLY_STRING:\
+												{\
+														res = ::atoll(reply->str);	\
+												}\
+						break;\
+				}\
+		}
+
+#define MACRO_REPLY_GET_INT64_RET(reply, res, ret)\
+		if (reply->type != REDIS_REPLY_ERROR)	\
+		{	\
+				ret = true;\
+				switch(reply->type)\
+				{	\
+						case REDIS_REPLY_INTEGER:\
+												 {\
+														 res = reply->integer;	\
+												 }\
+						break;\
+						case REDIS_REPLY_STRING:\
+												{\
+														res = ::atoll(reply->str);	\
+												}\
+						break;\
+				}\
+		}
+
+#define MACRO_REPLY_GET_INT64PTR_RET(reply, res, ret)\
+		if (reply->type != REDIS_REPLY_ERROR)	\
+		{	\
+				ret = true;\
+				switch(reply->type)\
+				{	\
+						case REDIS_REPLY_INTEGER:\
+												 {\
+														 if (res)\
+														 *res = reply->integer;	\
+												 }\
+						break;\
+						case REDIS_REPLY_STRING:\
+												{\
+														if (res)\
+														*res = ::atoll(reply->str);	\
+												}\
+						break;\
+				}\
+		}
+
+#define MACRO_REPLY_GET_STRING_RET(reply, value, ret)\
+		if (reply->type != REDIS_REPLY_ERROR)	\
+		{	\
+				ret = true;\
+				switch(reply->type)\
+				{	\
+						case REDIS_REPLY_INTEGER:\
+												 {\
+														 char tmp[64] = { 0 };	\
+														 sprintf(tmp, "%lld", reply->integer);	\
+														 value.assign(tmp, strlen(tmp));\
+												 }\
+						break;\
+						case REDIS_REPLY_STRING:\
+						case REDIS_REPLY_STATUS:\
+												{\
+														value.assign(reply->str, reply->len);\
+												}\
+						break;\
+				}\
+		}
+
+#define MACRO_REPLY_GET_STRING(reply, value)\
+		if (reply->type != REDIS_REPLY_ERROR)	\
+		{	\
+				switch(reply->type)\
+				{	\
+						case REDIS_REPLY_INTEGER:\
+												 {\
+														 char tmp[64] = { 0 };	\
+														 sprintf(tmp, "%lld", reply->integer);	\
+														 value.assign(tmp, strlen(tmp));\
+												 }\
+						break;\
+						case REDIS_REPLY_STRING:\
+						case REDIS_REPLY_STATUS:\
+												{\
+														value.assign(reply->str, reply->len);\
+												}\
+						break;\
+				}\
+		}
+
 }
