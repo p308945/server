@@ -119,7 +119,65 @@ int main()
 		std::cout << ret << "; valueVec Size:" << valueVec.size() << std::endl;
 		for (uint32_t i = 0; i < valueVec.size(); ++i)
 				std::cout << valueVec[i] << std::endl;
-
-
 		/* end hash */
+
+		/* list */
+
+		delCnt = 0;
+		ret = redisService.delKey("l", delCnt);
+		std::cout << ret << "; delCnt:" << delCnt << std::endl;
+
+		for (auto i = 0; i < 100; ++i)
+		{
+				std::ostringstream oss;
+				oss << i << " l";
+				if (i < 50)
+				{
+						ret = redisService.lpushList("l", oss.str());
+						std::cout << ret << std::endl;
+				}
+				else
+				{
+						ret = redisService.rpushList("l", oss.str());
+						std::cout << ret << std::endl;
+				}
+		}
+
+		std::string value;
+		ret = redisService.lpopList("l", value);
+		std::cout << ret << std::endl;
+		ret = redisService.rpopList("l", value);
+		std::cout << ret << std::endl;
+		ret = redisService.llenList("l", len);
+		std::cout << ret << ", llen:" << len << std::endl;
+
+		valueVec.clear();
+		ret = redisService.lrangeList("l", 0, -1, valueVec);
+		std::cout << ret << ", lrangeSize:" << valueVec.size() << std::endl;
+		for (auto &ref : valueVec)
+		{
+				std::cout << "value: " << ref << std::endl;
+		}
+		value.clear();
+		ret = redisService.lindexList("l", 0, value);
+		std::cout << "lindexList: " << value << std::endl;
+		int64_t count = 0;
+		ret = redisService.rpushList("l", "l1");
+		std::cout << ret << std::endl;
+
+		ret = redisService.lremList("l", 0, "l1", count);
+		std::cout << ret << ", lremList: "<< count << std::endl;
+
+		ret = redisService.ltrimList("l", 0, 2);
+		std::cout << ret << std::endl;
+
+		valueVec.clear();
+		ret = redisService.lrangeList("l", 0, -1, valueVec);
+		std::cout << ret << ", lrangeSize:" << valueVec.size() << std::endl;
+		for (auto &ref : valueVec)
+		{
+				std::cout << "value: " << ref << std::endl;
+		}
+
+		/* end list */
 }

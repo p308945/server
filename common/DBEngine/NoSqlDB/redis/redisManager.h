@@ -112,6 +112,19 @@ namespace goddard
 						bool hstrlenHash(const char *key, const char *field, int64_t &len);
 						/* end hash */
 
+						/* list */
+						bool lindexList(const char *key, const int64_t idx, std::string &value);
+						bool llenList(const char *key, int64_t &len);
+						bool lpopList(const char *key, std::string &value, bool saveValue = true);
+						bool lpushList(const char *key, const std::string &value);
+						bool lrangeList(const char *key, const int64_t start, const int64_t stop, stringVecType &valueVec); //[start, stop], [0, (len - 1)] or [-1, -len]
+						bool lremList(const char *key, const int64_t count, const std::string &value, int64_t &rtnCount); //if count > 0 from head to tail remove count items, count < 0 from tail to head remove |count| items, count == 0 remove all equal to value
+						bool lsetList(const char *key, const int64_t index, const std::string &value);
+						bool ltrimList(const char *key, const int64_t start, const int64_t stop);	//[start, stop], [0, len - 1]. if start > stop all item will be removed
+						bool rpopList(const char *key, std::string &value, bool saveValue = true);
+						bool rpushList(const char *key, const std::string &value);
+						/* end list */
+
 				private:
 						RedisManager() {}
 						RedisManager(const RedisManager &) = delete;

@@ -532,4 +532,205 @@ err:
 
 		/* end hash */
 
+		/* list */
+		bool RedisManager::lindexList(const char *key, const int64_t idx, std::string &value)
+		{
+				redisReply *reply = _component.fireCmd(key, LINDEX_LIST_FORMAT, key, idx);
+				if (!reply)
+						return false;
+				bool ret = false;
+				MACRO_REPLY_GET_STRING_RET(reply, value, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::llenList(const char *key, int64_t &len)
+		{
+				redisReply *reply = _component.fireCmd(key, LLEN_LIST_FORMAT, key);
+				if (!reply)
+						return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, len, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::lpopList(const char *key, std::string &value, bool saveValue)
+		{
+				redisReply *reply = _component.fireCmd(key, LPOP_LIST_FORMAT, key);
+				if (!reply)
+						return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						switch(reply->type)
+						{
+								case REDIS_REPLY_INTEGER:
+										{
+												if (saveValue)
+												{
+														char tmp[64] = { 0 };
+														sprintf(tmp, "%lld", reply->integer);
+														value.assign(tmp, strlen(tmp));
+												}
+										}
+										break;
+								case REDIS_REPLY_STRING:
+										{
+												if (saveValue)
+														value.assign(reply->str, reply->len);
+										}
+										break;
+								default:
+										{
+										}
+										break;
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::lpushList(const char *key, const std::string &value)
+		{
+				redisReply *reply = _component.fireCmd(key, LPUSH_LIST_FORMAT, key, value.c_str(), value.length());
+				if (!reply)
+						return false;
+				bool ret = false;
+				int64_t num = 0;
+				MACRO_REPLY_GET_INT64(reply, num);
+				if (num > 0) ret = true;
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::lrangeList(const char *key, const int64_t start, const int64_t stop, stringVecType &valueVec)
+		{
+				redisReply *reply = _component.fireCmd(key, LRANGE_LIST_FORMAT, key, start, stop);
+				if (!reply) return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						if (reply->type == REDIS_REPLY_ARRAY)
+						{
+								if (reply->elements > 0)
+								{
+										valueVec.reserve(reply->elements);
+										for (uint32_t i = 0; i < reply->elements; ++i)
+										{
+												std::string value;
+												MACRO_REPLY_GET_STRING(reply->element[i], value);
+												valueVec.push_back(value);
+										}
+								}
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::lremList(const char *key, const int64_t count, const std::string &value, int64_t &rtnCount)
+		{
+				redisReply *reply = _component.fireCmd(key, LREM_LIST_FORMAT, key, count, value.c_str(), value.length());
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, rtnCount, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::lsetList(const char *key, const int64_t index, const std::string &value)
+		{
+				redisReply *reply = _component.fireCmd(key, LSET_LIST_FORMAT, key, index, value.c_str(), value.length());
+				if (!reply) return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						switch(reply->type)
+						{
+								case REDIS_REPLY_STRING:
+										{
+												if (!strcasecmp("ok", reply->str)) ret = true;
+										}
+										break;
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::ltrimList(const char *key, const int64_t start, const int64_t stop)
+		{
+				redisReply *reply = _component.fireCmd(key, LTRIM_LIST_FORMAT, key, start, stop);
+				if (!reply) return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						switch(reply->type)
+						{
+								case REDIS_REPLY_STRING:
+								case REDIS_REPLY_STATUS:
+										{
+												if (!strcasecmp("ok", reply->str)) ret = true;
+										}
+										break;
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::rpopList(const char *key, std::string &value, bool saveValue)
+		{
+				redisReply *reply = _component.fireCmd(key, RPOP_LIST_FORMAT, key);
+				if (!reply)
+						return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						switch(reply->type)
+						{
+								case REDIS_REPLY_INTEGER:
+										{
+												if (saveValue)
+												{
+														char tmp[64] = { 0 };
+														sprintf(tmp, "%lld", reply->integer);
+														value.assign(tmp, strlen(tmp));
+												}
+										}
+										break;
+								case REDIS_REPLY_STRING:
+										{
+												if (saveValue)
+														value.assign(reply->str, reply->len);
+										}
+										break;
+								default:
+										{
+										}
+										break;
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::rpushList(const char *key, const std::string &value)
+		{
+				redisReply *reply = _component.fireCmd(key, RPUSH_LIST_FORMAT, key, value.c_str(), value.length());
+				if (!reply)
+						return false;
+				bool ret = false;
+				int64_t num = 0;
+				MACRO_REPLY_GET_INT64(reply, num);
+				if (num > 0) ret = true;
+				freeReplyObject(reply);
+				return ret;
+		}
+		/* end list */
+
 }
