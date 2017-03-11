@@ -374,4 +374,82 @@ int main()
 		std::cout << ret << ", score: "<< score << std::endl;
 
 		/* end sortset */
+
+		/* geo */
+		delCnt = 0;
+		ret = redisService.delKey("geo", delCnt);
+		std::cout << ret << ", delCnt" << delCnt << std::endl;
+
+		ddPairType degree(80, -45);
+		int64_t num = 0;
+		ret = redisService.geoaddGeo("geo", degree, "geo:member1", num);
+		std::cout << ret << ", num:" << num << std::endl;
+
+		degree = std::make_pair(80, -47);
+		num = 0;
+		ret = redisService.geoaddGeo("geo", degree, "geo:member1", num);
+		std::cout << ret << ", num:" << num << std::endl;
+
+		degree = std::make_pair(80, -47);
+		num = 0;
+		ret = redisService.geoaddGeo("geo", degree, "geo:member1", num);
+		std::cout << ret << ", num:" << num << std::endl;
+
+		degree = std::make_pair(80, -50);
+		num = 0;
+		ret = redisService.geoaddGeo("geo", degree, "geo:member1", num);
+		std::cout << ret << ", num:" << num << std::endl;
+
+		degree = std::make_pair(80.0001, -50);
+		num = 0;
+		ret = redisService.geoaddGeo("geo", degree, "geo:member2", num);
+		std::cout << ret << ", num:" << num << std::endl;
+
+		degree = std::make_pair(80.0002, -50);
+		num = 0;
+		ret = redisService.geoaddGeo("geo", degree, "geo:member3", num);
+		std::cout << ret << ", num:" << num << std::endl;
+
+		degree = std::make_pair(80.0003, -45);
+		num = 0;
+		ret = redisService.geoaddGeo("geo", degree, "geo:member4", num);
+		std::cout << ret << ", num:" << num << std::endl;
+
+		degree = std::make_pair(70, -37);
+		num = 0;
+		ret = redisService.geoaddGeo("geo", degree, "geo:member5", num);
+		std::cout << ret << ", num:" << num << std::endl;
+
+		degree = std::make_pair(0, 0);
+		ret = redisService.geoposGeo("geo", "geo:member1", degree);
+		std::cout << ret << ", longtitude:" << degree.first << ", latitude:" << degree.second << std::endl;
+
+		ret = redisService.geoposGeo("geo", "geo:member5", degree);
+		std::cout << ret << ", longtitude:" << degree.first << ", latitude:" << degree.second << std::endl;
+
+		double distM = 0.0;
+		ret = redisService.geodistGeo("geo", "geo:member3", "geo:member2", distM);
+		std::cout << ret << ", distM:" << distM << std::endl;
+
+		distM = 0.0;
+		ret = redisService.geodistGeo("geo", "geo:member3", "geo:member5", distM);
+		std::cout << ret << ", distM:" << distM << std::endl;
+
+		sdPairVecType sdVec;
+		degree = std::make_pair(80, -50);
+		double radius = 10.0;
+		ret = redisService.georadiusGeo("geo", degree, radius, 2, sdVec);
+		std::cout << ret << ", size:" << sdVec.size() << std::endl;
+		for (auto &ref : sdVec)
+				std::cout << "member: " << ref.first << ", dist: " << ref.second << std::endl;
+
+		radius = 10.0;
+		sdVec.clear();
+		ret = redisService.georadiusByMemberGeo("geo", "geo:member1", radius, 10, sdVec);
+		std::cout << ret << ", size:" << sdVec.size() << std::endl;
+		for (auto &ref : sdVec)
+				std::cout << "member: " << ref.first << ", dist: " << ref.second << std::endl;
+
+
+		/* end geo */
 }

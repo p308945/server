@@ -1084,5 +1084,115 @@ end:
 		}
 		/* end sortset */
 
+		/* geo */
+		bool RedisManager::geoaddGeo(const char *key, const ddPairType &degree /* <longtitude, latitude> */, const std::string &member, int64_t &num)
+		{
+				redisReply *reply = _component.fireCmd(key, GEOADD_GEO_FORMAT, key, degree.first, degree.second, member.c_str(), member.length());
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, num, ret);
+				(void)num;
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::geoposGeo(const char *key, const std::string &member, ddPairType &degree /* <longtitude, latitude> */)
+		{
+				redisReply *reply = _component.fireCmd(key, GEOPOS_GEO_FORMAT, key, member.c_str(), member.length());
+				if (!reply) return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						if (reply->type == REDIS_REPLY_ARRAY)
+						{
+								if (reply->elements > 0)
+								{
+										if (reply->element[0]->type == REDIS_REPLY_ARRAY && 2 == reply->element[0]->elements)
+										{
+												MACRO_REPLY_GET_DOUBLE_RET(reply->element[0]->element[0], degree.first, ret);
+												MACRO_REPLY_GET_DOUBLE_RET(reply->element[0]->element[1], degree.second, ret);
+										}
+								}
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::geodistGeo(const char *key, const std::string &memberA, const std::string &memberB, double &distM /* unit ism */)
+		{
+				redisReply *reply = _component.fireCmd(key, GEODIST_GEO_FORMAT, key, memberA.c_str(), memberA.length(), memberB.c_str(), memberB.length());
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_DOUBLE_RET(reply, distM, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+#define MACRO_GEO_RADIUS_GET(prefix, resVec, ismember)	\
+		char cmd[256] = { 0 };	\
+		strcpy(cmd, prefix);	\
+		strcat(cmd, GEORADIUS_GEO_FORMAT_PART_WITHDIST);	\
+		if (1 == sortRule)\
+				strcat(cmd, GEORADIUS_GEO_FORMAT_PART_ASC);	\
+		else if (2 == sortRule)\
+				strcat(cmd, GEORADIUS_GEO_FORMAT_PART_DESC);	\
+		strcat(cmd, GEORADIUS_GEO_FORMAT_PART_COUNT);	\
+		redisReply *reply = NULL;\
+		if (ismember) 	\
+				reply = _component.fireCmd(key, cmd, key, member.c_str(), member.length(), radius, count);	\
+		else	\
+				reply = _component.fireCmd(key, cmd, key, myDegree.first, myDegree.second, radius, count);	\
+		if (!reply) return false;	\
+		bool ret = false;\
+		if (reply->type != REDIS_REPLY_ERROR)	\
+		{\
+				ret = true;\
+				if (reply->type == REDIS_REPLY_ARRAY)\
+				{	\
+						if (reply->elements > 0)\
+						{\
+								resVec.reserve(reply->elements);\
+								for (uint32_t i = 0; i < reply->elements; ++i)\
+								{\
+										redisReply *element = reply->element[i]; \
+										if (2 == element->elements)	\
+										{	\
+												std::string value;\
+												double distM = 0.0;\
+												bool data1 = false;\
+												bool data2 = false;\
+												MACRO_REPLY_GET_STRING_RET(element->element[0], value, data1);	\
+												MACRO_REPLY_GET_DOUBLE_RET(element->element[1], distM, data2);	\
+												if (data1 && data2)\
+														resVec.emplace_back(value, distM);\
+										}	\
+								}\
+						}\
+				}	\
+		}\
+		freeReplyObject(reply);\
+		return ret;
+
+		bool RedisManager::georadiusGeo(const char *key, const ddPairType &myDegree, const double radius /* unit is m */, const int64_t count, sdPairVecType &resVec, int sortRule /* 0 no sort, 1 asc, 2 desc */)
+		{
+				std::string member;		//just for compile
+				MACRO_GEO_RADIUS_GET(GEORADIUS_GEO_FORMAT, resVec, false);
+		}
+
+		bool RedisManager::georadiusByMemberGeo(const char *key, const std::string &member, const double radius /* unit is m */, const int64_t count, sdPairVecType &resVec, int sortRule /* 0 no sort, 1 asc, 2 desc */)
+		{
+				ddPairType myDegree;		//just for compile
+				MACRO_GEO_RADIUS_GET(GEORADIUSBYMEMBER_GEO_FORMAT, resVec, true);
+		}
+
+		bool RedisManager::geodelGeo(const char *key, const std::string &member, int64_t &remCount)
+		{
+				return zremSortset(key, member, remCount);
+		}
+
+		/* end geo */
+
 
 }

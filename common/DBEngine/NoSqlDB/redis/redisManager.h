@@ -152,6 +152,16 @@ namespace goddard
 						bool zscoreSortset(const char *key, const std::string &member, double &score);
 						/* end sortset */
 
+						/* geo */
+						bool geoaddGeo(const char *key, const ddPairType &degree /* <longtitude, latitude> */, const std::string &member, int64_t &num);
+						bool geoposGeo(const char *key, const std::string &member, ddPairType &degree /* <longtitude, latitude> */);
+						bool geodistGeo(const char *key, const std::string &memberA, const std::string &memberB, double &distM /* unit ism */);
+						bool georadiusGeo(const char *key, const ddPairType &degree, const double radius /* unit is m */, const int64_t count, sdPairVecType &resVec, int sortRule = 0 /* 0 no sort, 1 asc, 2 desc */);
+						bool georadiusByMemberGeo(const char *key, const std::string &member, const double radius /* unit is m */, const int64_t count, sdPairVecType &resVec, int sortRule = 0/* 0 no sort, 1 asc, 2 desc */);
+						bool geodelGeo(const char *key, const std::string &member, int64_t &remCount);
+
+						/* end geo */
+
 				private:
 						RedisManager() {}
 						RedisManager(const RedisManager &) = delete;
