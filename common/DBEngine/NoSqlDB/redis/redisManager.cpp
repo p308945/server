@@ -133,6 +133,25 @@ err:
 				}\
 		}
 
+#define MACRO_REPLY_GET_DOUBLE_RET(reply, res, ret)\
+		if (reply->type != REDIS_REPLY_ERROR)	\
+		{	\
+				ret = true;\
+				switch(reply->type)\
+				{	\
+						case REDIS_REPLY_INTEGER:\
+												 {\
+														 res = reply->integer;	\
+												 }\
+						break;\
+						case REDIS_REPLY_STRING:\
+												{\
+														res = ::atof(reply->str);	\
+												}\
+						break;\
+				}\
+		}
+
 #define MACRO_REPLY_GET_INT64PTR_RET(reply, res, ret)\
 		if (reply->type != REDIS_REPLY_ERROR)	\
 		{	\
@@ -829,6 +848,241 @@ err:
 
 		}
 		/* end set */
+
+		/* sortset */
+		bool RedisManager::zaddSortset(const char *key, const std::string &value, const double score, int64_t &count)
+		{
+				redisReply *reply = _component.fireCmd(key, ZADD_SORTSET_FORMAT, key, score, value.c_str(), value.length());
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, count, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zcardSortset(const char *key, int64_t &count)
+		{
+				redisReply *reply = _component.fireCmd(key, ZCARD_SORTSET_FORMAT, key);
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, count, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zcountSortset(const char *key, const double min, const double max, int64_t &count)
+		{
+				redisReply *reply = _component.fireCmd(key, ZCOUNT_SORTSET_FORMAT, key, min, max);
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, count, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zincrbySortset(const char *key, const double by, const std::string &value, double &newScore)
+		{
+				redisReply *reply = _component.fireCmd(key, ZINCRBY_SORTSET_FORMAT, key, by, value.c_str(), value.length());
+				if (!reply) return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						switch(reply->type)
+						{
+								case REDIS_REPLY_STRING:
+										{
+												newScore = ::atof(reply->str);
+										}
+										break;
+								case REDIS_REPLY_INTEGER:
+										{
+												newScore = reply->integer;
+										}
+										break;
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+#define MACRO_SORT_SET_VS_RES(reply, vsVec)	\
+		bool ret = false;\
+		do\
+		{	\
+				if (reply->type != REDIS_REPLY_ERROR)			\
+				{	\
+						ret = true;\
+						if (reply->type == REDIS_REPLY_ARRAY)\
+						{	\
+								if (reply->elements > 0)\
+								{	\
+										if (withscore)\
+										{	\
+												if (!iseven(reply->elements))\
+												{	\
+														goto end;	\
+												}	\
+												vsVec.reserve(reply->elements / 2);	\
+										}	\
+										else \
+										vsVec.reserve(reply->elements);\
+										for (uint32_t i = 0; i < reply->elements; )\
+										{	\
+												std::string value;\
+												double score = 0.0;\
+												switch(reply->element[i]->type)\
+												{	\
+														case REDIS_REPLY_INTEGER:\
+																				 {\
+																						 char tmp[64] = { 0 };\
+																						 sprintf(tmp, "%lld", reply->element[i]->integer);\
+																						 value.assign(tmp, strlen(tmp));\
+																				 }\
+														break;\
+														case REDIS_REPLY_STRING:\
+																				{\
+																						value.assign(reply->element[i]->str, reply->element[i]->len);\
+																				}\
+														break;\
+												}\
+												if (withscore)\
+												{\
+														switch(reply->element[i + 1]->type)\
+														{\
+																case REDIS_REPLY_INTEGER:\
+																						 {\
+																							 	 score = reply->element[i + 1]->integer;\
+																						 }\
+																break;\
+																case REDIS_REPLY_STRING:\
+																						{\
+																								score = ::atof(reply->element[i + 1]->str);\
+																						}\
+																break;\
+														}\
+												}\
+												vsVec.emplace_back(std::make_pair(value, score));\
+												if (withscore) i += 2;\
+												else ++i;\
+										}\
+								}\
+						}\
+				}\
+		}while(0)
+
+		bool RedisManager::zrangeSortset(const char *key, const int64_t start, const int64_t stop, vsPairVecType &vsVec /* member<->score */, bool withscore)
+		{
+				const char *format = NULL;
+				if (withscore) format = ZRANGE_WITHSCORES_SORTSET_FORMAT;
+				else format = ZRANGE_SORTSET_FORMAT;
+				redisReply *reply = _component.fireCmd(key, format, key, start, stop);
+				if (!reply) return false;
+				MACRO_SORT_SET_VS_RES(reply, vsVec);
+end:
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zrangeByScoreSortset(const char *key, const double min, const double max, vsPairVecType &vsVec /* member<->score */, bool withscore)
+		{
+				const char *format = NULL;
+				if (withscore) format = ZRANGEBYSCORE_WITHSCORES_SORTSET_FORMAT;
+				else format = ZRANGEBYSCORE_SORTSET_FORMAT;
+				redisReply *reply = _component.fireCmd(key, format, key, min, max);
+				if (!reply) return false;
+				MACRO_SORT_SET_VS_RES(reply, vsVec);
+end:
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zrankSortset(const char *key, const std::string &member, int64_t &rank)
+		{
+				redisReply *reply = _component.fireCmd(key, ZRANK_SORTSET_FORMAT, key, member.c_str(), member.length());
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, rank, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zremSortset(const char *key, const std::string &member, int64_t &remCount)
+		{
+				redisReply *reply = _component.fireCmd(key, ZREM_SORTSET_FORMAT, key, member.c_str(), member.length());
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, remCount, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zremRangeByRankSortset(const char *key, const int64_t start, const int64_t stop, int64_t &remCount)
+		{
+				redisReply *reply = _component.fireCmd(key, ZREMRANGEBYRANK_SORTSET_FORMAT, key, start, stop);
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, remCount, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zremRangeByScoreSortset(const char *key, const double min, const double max, int64_t &remCount)
+		{
+				redisReply *reply = _component.fireCmd(key, ZREMRANGEBYSCORE_SORTSET_FORMAT, key, min, max);
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, remCount, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zrevrangeSortset(const char *key, const int64_t start, const int64_t stop, vsPairVecType &vsVec /* member<->score */, bool withscore)
+		{
+				const char *format = NULL;
+				if (withscore) format = ZREVRANGE_WITHSCORES_SORTSET_FORMAT;
+				else format = ZREVRANGE_SORTSET_FORMAT;
+				redisReply *reply = _component.fireCmd(key, format, key, start, stop);
+				if (!reply) return false;
+				MACRO_SORT_SET_VS_RES(reply, vsVec);
+end:
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zrevrangeByScoreSortset(const char *key, const double min, const double max, vsPairVecType &vsVec /* member<->score */, bool withscore)
+		{
+				const char *format = NULL;
+				if (withscore) format = ZREVRANGEBYSCORE_WITHSCORES_SORTSET_FORMAT;
+				else format = ZREVRANGEBYSCORE_SORTSET_FORMAT;
+				redisReply *reply = _component.fireCmd(key, format, key, max, min);
+				if (!reply) return false;
+				MACRO_SORT_SET_VS_RES(reply, vsVec);
+end:
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zrevrankSortset(const char *key, const std::string &member, int64_t &rank)
+		{
+				redisReply *reply = _component.fireCmd(key, ZREVRANK_SORTSET_FORMAT, key, member.c_str(), member.length());
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, rank, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::zscoreSortset(const char *key, const std::string &member, double &score)
+		{
+				redisReply *reply = _component.fireCmd(key, ZSCORE_SORTSET_FORMAT, key, member.c_str(), member.length());
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_DOUBLE_RET(reply, score, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+		/* end sortset */
 
 
 }

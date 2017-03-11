@@ -135,6 +135,23 @@ namespace goddard
 						bool sremSet(const char *key, const std::string &value, int64_t &remCnt);
 						/* end set */
 
+						/* sortset */
+						bool zaddSortset(const char *key, const std::string &value, const double score, int64_t &count);
+						bool zcardSortset(const char *key, int64_t &count);
+						bool zcountSortset(const char *key, const double min, const double max, int64_t &count); //return score in [min, max] count of sortset members, if min > max return 0
+						bool zincrbySortset(const char *key, const double by, const std::string &value, double &newScore);
+						bool zrangeSortset(const char *key, const int64_t start, const int64_t stop, vsPairVecType &vsVec /* member<->score */, bool withscore = false);	//asc rank : [0, len -1] or [-1, -len], if true == withscore return member<->score else return member and score will not be returned
+						bool zrangeByScoreSortset(const char *key, const double min, const double max, vsPairVecType &vsVec /* member<->score */, bool withscore = false);	//asc rank, score: [min, max] or [-1, -len], if true == withscore return member<->score else return member and score will not be returned
+						bool zrankSortset(const char *key, const std::string &member, int64_t &rank);
+						bool zremSortset(const char *key, const std::string &member, int64_t &remCount);
+						bool zremRangeByRankSortset(const char *key, const int64_t start, const int64_t stop, int64_t &remCount);	//[0, len - 1] or [ -1, - len]
+						bool zremRangeByScoreSortset(const char *key, const double min, const double max, int64_t &remCount);
+						bool zrevrangeSortset(const char *key, const int64_t start, const int64_t stop, vsPairVecType &vsVec /* member<->score */, bool withscore = false);	//desc rank : [0, len -1] or [-1, -len], if true == withscore return member<->score else return member and score will not be returned
+						bool zrevrangeByScoreSortset(const char *key, const double min, const double max, vsPairVecType &vsVec /* member<->score */, bool withscore = false);	//desc rank : [min, max], if true == withscore return member<->score else return member and score will not be returned
+						bool zrevrankSortset(const char *key, const std::string &member, int64_t &rank);
+						bool zscoreSortset(const char *key, const std::string &member, double &score);
+						/* end sortset */
+
 				private:
 						RedisManager() {}
 						RedisManager(const RedisManager &) = delete;

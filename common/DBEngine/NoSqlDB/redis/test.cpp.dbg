@@ -256,6 +256,122 @@ int main()
 		ret = redisService.sremSet("s", "s1", remCnt);
 		std::cout << ret << ", remCnt: "<< remCnt << std::endl;
 
-
 		/* end set */
+
+		/* sortset */
+		delCnt = 0;
+		ret = redisService.delKey("zs", delCnt);
+		std::cout << ret << ", delCnt: "<< delCnt << std::endl;
+		count = 0;
+		ret = redisService.zaddSortset("zs", "s1", 1.1, count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.zaddSortset("zs", "s2", 2.2, count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.zaddSortset("zs", "s2", 2.2, count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.zaddSortset("zs", "s2", 2.3, count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.zaddSortset("zs", "s3", 3.3, count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.zaddSortset("zs", "s4", 4.4, count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.zaddSortset("zs", "s5", 5.5, count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.zaddSortset("zs", "s6", 6.6, count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.zaddSortset("zs", "s7", 7.7, count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.zaddSortset("zs", "s8", 8.8, count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.zcardSortset("zs", count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.zcountSortset("zs", 1.1, 3.3, count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		double newScore = 0.0;
+		ret = redisService.zincrbySortset("zs", -0.3, "s5", newScore);
+		std::cout << ret << ", newScore: "<< newScore << std::endl;
+
+		vsPairVecType vsVec;
+		ret = redisService.zrangeSortset("zs", 0, 3, vsVec, true);
+		std::cout << ret << ", size: "<< vsVec.size() << std::endl;
+		for (auto &ref : vsVec)
+				std::cout << "member: "<< ref.first << ", score:" << ref.second << std::endl;
+
+		vsVec.clear();
+		ret = redisService.zrangeSortset("zs", -2, -1, vsVec, false);
+		std::cout << ret << ", size: "<< vsVec.size() << std::endl;
+		for (auto &ref : vsVec)
+				std::cout << "member: "<< ref.first << ", score:" << ref.second << std::endl;
+
+		vsVec.clear();
+		ret = redisService.zrangeByScoreSortset("zs", 1.0, 3.0, vsVec, true);
+		std::cout << ret << ", size: "<< vsVec.size() << std::endl;
+		for (auto &ref : vsVec)
+				std::cout << "member: "<< ref.first << ", score:" << ref.second << std::endl;
+
+		vsVec.clear();
+		ret = redisService.zrangeByScoreSortset("zs", 2.0, 0.0, vsVec, false);
+		std::cout << ret << ", size: "<< vsVec.size() << std::endl;
+		for (auto &ref : vsVec)
+				std::cout << "member: "<< ref.first << ", score:" << ref.second << std::endl;
+
+		int64_t rank = (int64_t)-1;
+		ret = redisService.zrankSortset("zs", "s1", rank);
+		std::cout << ret << ", rank: "<< rank << std::endl;
+
+		remCnt = 0;
+		ret = redisService.zremSortset("zs", "s1", remCnt);
+		std::cout << ret << ", remCnt: "<< remCnt << std::endl;
+
+		remCnt = 0;
+		ret = redisService.zremRangeByRankSortset("zs", 0, 1, remCnt);
+		std::cout << ret << ", remCnt: "<< remCnt << std::endl;
+
+		remCnt = 0;
+		ret = redisService.zremRangeByScoreSortset("zs", 4.0, 6.0, remCnt);
+		std::cout << ret << ", remCnt: "<< remCnt << std::endl;
+
+		vsVec.clear();
+		ret = redisService.zrevrangeSortset("zs", 0, 1, vsVec, true);
+		for (auto &ref : vsVec)
+				std::cout << "member: "<< ref.first << ", score:" << ref.second << std::endl;
+
+		std::cout << "xxxxx" << std::endl;
+		vsVec.clear();
+		ret = redisService.zrevrangeByScoreSortset("zs", 5.0, 10.0, vsVec, true);
+		for (auto &ref : vsVec)
+				std::cout << "member: "<< ref.first << ", score:" << ref.second << std::endl;
+
+		rank = (int64_t)-1;
+		ret = redisService.zrevrankSortset("zs", "s8", rank);
+		std::cout << ret << ", rank: "<< rank << std::endl;
+
+		double score = 0.0;
+		ret = redisService.zscoreSortset("zs", "s8", score);
+		std::cout << ret << ", score: "<< score << std::endl;
+
+		/* end sortset */
 }
