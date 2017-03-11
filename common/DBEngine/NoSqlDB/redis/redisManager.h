@@ -125,6 +125,16 @@ namespace goddard
 						bool rpushList(const char *key, const std::string &value);
 						/* end list */
 
+						/* set */
+						bool saddSet(const char *key, const std::string &value, int64_t &num);
+						bool scardSet(const char *key, int64_t &count);
+						bool sismemberSet(const char *key, const std::string &value, bool &ismember);
+						bool smembersSet(const char *key, stringVecType &valueVec);
+						bool spopSet(const char *key, std::string &value);
+						bool srandmemberSet(const char *key, stringVecType &valueVec, const int64_t count = 1);	//if count > 0 count = count < set.totalCnt ? count : set.totalCnt, return count elements, all elements are different; if count < 0, return |count| elements, each element  may be repeated many times
+						bool sremSet(const char *key, const std::string &value, int64_t &remCnt);
+						/* end set */
+
 				private:
 						RedisManager() {}
 						RedisManager(const RedisManager &) = delete;

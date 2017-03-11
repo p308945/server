@@ -180,4 +180,82 @@ int main()
 		}
 
 		/* end list */
+
+		/* set */
+		delCnt = 0;
+		ret = redisService.delKey("s", delCnt);
+		std::cout << ret << ", delCnt: "<< delCnt << std::endl;
+
+		count = 0;
+		ret = redisService.scardSet("s", count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		ret = redisService.saddSet("s", "s1", count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		ret = redisService.saddSet("s", "s2", count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		ret = redisService.saddSet("s", "s1", count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		ret = redisService.saddSet("s", "s3", count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		ret = redisService.saddSet("s", "s4", count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		ret = redisService.saddSet("s", "s5", count);
+		std::cout << ret << ", count: "<< count << std::endl;
+		
+		ret = redisService.saddSet("s", "s3", count);
+		std::cout << ret << ", count: "<< count << std::endl;
+		
+		ret = redisService.saddSet("s", "s5", count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		count = 0;
+		ret = redisService.scardSet("s", count);
+		std::cout << ret << ", count: "<< count << std::endl;
+
+		bool ismember = false;
+		ret = redisService.sismemberSet("s", "s1", ismember);
+		std::cout << ret << ", ismember: "<< ismember << std::endl;
+		ret = redisService.sismemberSet("s", "ss1", ismember);
+		std::cout << ret << ", ismember: "<< ismember << std::endl;
+		ret = redisService.sismemberSet("s", "s2", ismember);
+		std::cout << ret << ", ismember: "<< ismember << std::endl;
+		ret = redisService.sismemberSet("s", "ss2", ismember);
+		std::cout << ret << ", ismember: "<< ismember << std::endl;
+		ret = redisService.sismemberSet("s", "s3", ismember);
+		std::cout << ret << ", ismember: "<< ismember << std::endl;
+		ret = redisService.sismemberSet("s", "ss3", ismember);
+		std::cout << ret << ", ismember: "<< ismember << std::endl;
+
+		valueVec.clear();
+		ret = redisService.smembersSet("s", valueVec);
+		std::cout << ret << ", size: "<< valueVec.size() << std::endl;
+		for (auto &ref : valueVec)
+		{
+				std::cout << "value: "<< ref << std::endl;
+		}
+
+		value.clear();
+		ret = redisService.spopSet("s", value);
+		std::cout << ret << ", value: "<< value << std::endl;
+
+		valueVec.clear();
+		ret = redisService.srandmemberSet("s", valueVec, -4);
+		std::cout << ret << ", size: "<< valueVec.size() << std::endl;
+		for (auto &ref : valueVec)
+		{
+				std::cout << "value: "<< ref << std::endl;
+		}
+
+		int64_t remCnt = 0;
+		ret = redisService.sremSet("s", "s1", remCnt);
+		std::cout << ret << ", remCnt: "<< remCnt << std::endl;
+
+
+		/* end set */
 }

@@ -101,8 +101,8 @@ namespace goddard
 /* end list */
 
 /* set */
-//#define SADD_SET_FORMAT "SADD %s %b"
-//#define SCARD_SET_FORMAT "SCARD %s"
+#define SADD_SET_FORMAT "SADD %s %b"
+#define SCARD_SET_FORMAT "SCARD %s"
 //#define SDIFF_SET_FORMAT "SDIFF"
 //#define SDIFF_SET_FORMAT_PART " %s"
 //#define SDIFFSTORE_SET_FORMAT "SDIFF %s"
@@ -111,12 +111,12 @@ namespace goddard
 //#define SINTER_SET_FORMAT_PART " %s"
 //#define SINTERSTORE_SET_FORMAT "SINTERSTORE %s"
 //#define SINTERSTORE_SET_FORMAT_PART " %s"
-//#define SISMEMBER_SET_FORMAT "SISMEMBER %s %b"
-//#define SMEMBERS_SET_FORMAT "SMEMBERS %s"
+#define SISMEMBER_SET_FORMAT "SISMEMBER %s %b"
+#define SMEMBERS_SET_FORMAT "SMEMBERS %s"
 //#define SMOVE_SET_FORMAT "SMOVE %s %s %b"
-//#define SPOP_SET_FORMAT "SPOP %s"
-//#define SRANDMEMBER_SET_FORMAT "SRANDMEMBER %s %lld"
-//#define SREM_SET_FORMAT "SREM %s %b"
+#define SPOP_SET_FORMAT "SPOP %s"
+#define SRANDMEMBER_SET_FORMAT "SRANDMEMBER %s %lld"
+#define SREM_SET_FORMAT "SREM %s %b"
 //#define SREM_SET_FORMAT_PART " %b"
 //#define SUNION_SET_FORMAT "SUNION"
 //#define SUNION_SET_FORMAT_PART " %s"

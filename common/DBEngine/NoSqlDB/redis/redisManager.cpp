@@ -201,15 +201,9 @@ err:
 		bool RedisManager::delKey(const char *key, int64_t &delCnt)
 		{
 				redisReply *reply = _component.fireCmd(key, DEL_KEY_FORMAT, key);
+				if (!reply) return false;
 				bool ret = false;
-				if (!ret)
-				{
-						return ret;
-				}
-				if (REDIS_REPLY_ERROR != reply->type)
-				{
-						MACRO_REPLY_GET_INT64_RET(reply, delCnt, ret);
-				}
+				MACRO_REPLY_GET_INT64_RET(reply, delCnt, ret);
 				freeReplyObject(reply);
 				return ret;
 		}
@@ -217,11 +211,8 @@ err:
 		bool RedisManager::existsKey(const char *key, int64_t &exists)	//0 exists, 1 not exists, 2 error
 		{
 				redisReply *reply = _component.fireCmd(key, EXISTS_KEY_FORMAT, key);
+				if (!reply) return false;
 				bool ret = false;
-				if (!reply)
-				{
-						return ret;
-				}
 				exists = 2;
 				if (reply->type != REDIS_REPLY_ERROR)
 				{
@@ -262,9 +253,8 @@ err:
 		bool RedisManager::pexpireAtKey(const char *key, const uint64_t ms, bool &setSucc)
 		{
 				redisReply *reply = _component.fireCmd(key, PEXPIRE_AT_KEY_FORMAT, key, ms);
+				if (!reply) return false;
 				bool ret = false;
-				if (!ret)
-					return ret;
 				if (reply->type != REDIS_REPLY_ERROR)
 				{
 						ret = true;
@@ -283,9 +273,8 @@ err:
 		bool RedisManager::pttlKey(const char *key, int64_t &pttl)
 		{
 				redisReply *reply = _component.fireCmd(key, PTTL_KEY_FORMAT, key);
+				if (!reply) return false;
 				bool ret = false;
-				if (!reply)
-					return ret;
 				MACRO_REPLY_GET_INT64_RET(reply, pttl, ret);
 				freeReplyObject(reply);
 				return ret;
@@ -732,5 +721,114 @@ err:
 				return ret;
 		}
 		/* end list */
+
+		/* set */
+		bool RedisManager::saddSet(const char *key, const std::string &value, int64_t &num)
+		{
+				redisReply *reply = _component.fireCmd(key, SADD_SET_FORMAT, key, value.c_str(), value.length());
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, num, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::scardSet(const char *key, int64_t &count)
+		{
+				redisReply *reply = _component.fireCmd(key, SCARD_SET_FORMAT, key);
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, count, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::sismemberSet(const char *key, const std::string &value, bool &ismember)
+		{
+				redisReply *reply = _component.fireCmd(key, SISMEMBER_SET_FORMAT, key, value.c_str(), value.length());
+				if (!reply) return false;
+				bool ret = false;
+				int64_t count = 0;
+				MACRO_REPLY_GET_INT64_RET(reply, count, ret);
+				if (count > 0) ismember = true;
+				else ismember = false;
+				freeReplyObject(reply);
+				return ret;
+
+		}
+		bool RedisManager::smembersSet(const char *key, stringVecType &valueVec)
+		{
+				redisReply *reply = _component.fireCmd(key, SMEMBERS_SET_FORMAT, key);
+				if (!reply) return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						if (reply->type == REDIS_REPLY_ARRAY)
+						{
+								if (reply->elements > 0)
+								{
+										valueVec.reserve(reply->elements);
+										for (uint32_t i = 0; i < reply->elements; ++i)
+										{
+												std::string value;
+												MACRO_REPLY_GET_STRING(reply->element[i], value);
+												valueVec.push_back(value);
+										}
+								}
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::spopSet(const char *key, std::string &value)
+		{
+				redisReply *reply = _component.fireCmd(key, SPOP_SET_FORMAT, key);
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_STRING_RET(reply, value, ret);
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::srandmemberSet(const char *key, stringVecType &valueVec, const int64_t count)
+		{
+				redisReply *reply = _component.fireCmd(key, SRANDMEMBER_SET_FORMAT, key, count);
+				if (!reply) return false;
+				bool ret = false;
+				if (reply->type != REDIS_REPLY_ERROR)
+				{
+						ret = true;
+						if (reply->type == REDIS_REPLY_ARRAY)
+						{
+								if (reply->elements > 0)
+								{
+										valueVec.reserve(reply->elements);
+										for (uint32_t i = 0; i < reply->elements; ++i)
+										{
+												std::string value;
+												MACRO_REPLY_GET_STRING(reply->element[i], value);
+												valueVec.push_back(value);
+										}
+								}
+						}
+				}
+				freeReplyObject(reply);
+				return ret;
+		}
+
+		bool RedisManager::sremSet(const char *key, const std::string &value, int64_t &remCnt)
+		{
+				redisReply *reply = _component.fireCmd(key, SREM_SET_FORMAT, key, value.c_str(), value.length());
+				if (!reply) return false;
+				bool ret = false;
+				MACRO_REPLY_GET_INT64_RET(reply, remCnt, ret);
+				freeReplyObject(reply);
+				return ret;
+
+		}
+		/* end set */
+
 
 }
