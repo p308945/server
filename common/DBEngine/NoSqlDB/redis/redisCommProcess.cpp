@@ -8,7 +8,7 @@
  *        Version:  1.0
  *        Created:  03/09/2017 11:07:10 PM
  *       Revision:  none
- *       Compiler:  gcc
+ *       Compiler:  g++
  *
  *         Author:  huangyun.goddard (), 895175589@qq.com
  *   Organization:  
