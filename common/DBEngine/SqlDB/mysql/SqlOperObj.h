@@ -19,11 +19,14 @@
 #ifndef __SQLOPEROBJ_H__
 #define __SQLOPEROBJ_H__
 
+#include "defmySqlType.h"
+
 namespace goddard
 {
 		class SqlOperObj
 		{
 
+				DBOperContex _ctx;
 		};
 }
 

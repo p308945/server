@@ -19,6 +19,8 @@
 #ifndef __DEFMYSQLTYPE_H__
 #define __DEFMYSQLTYPE_H__
 
+#include <cstdint>
+
 namespace goddard
 {
 		struct ConnDBConfig
@@ -30,6 +32,11 @@ namespace goddard
 				uint16_t _unPort;
 		};
 
+
+		struct DBOperContex
+		{
+				uint64_t operID;
+		};
 }
 
 #endif
