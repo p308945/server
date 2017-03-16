@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  defmySqlType.h
+ *       Filename:  SqlOperObj.h
  *
- *    Description:  defmySqlType
+ *    Description:  SqlOperObj
  *
  *        Version:  1.0
- *        Created:  03/15/2017 11:05:21 PM
+ *        Created:  03/16/2017 03:49:54 PM
  *       Revision:  none
  *       Compiler:  g++
  *
@@ -16,20 +16,15 @@
  * =====================================================================================
  */
 
-#ifndef __DEFMYSQLTYPE_H__
-#define __DEFMYSQLTYPE_H__
+#ifndef __SQLOPEROBJ_H__
+#define __SQLOPEROBJ_H__
 
 namespace goddard
 {
-		struct ConnDBConfig
+		class SqlOperObj
 		{
-				std::string _strHost;
-				std::string _strUser;
-				std::string _strPasswd;
-				std::string _strDbName;
-				uint16_t _unPort;
-		};
 
+		};
 }
 
 #endif

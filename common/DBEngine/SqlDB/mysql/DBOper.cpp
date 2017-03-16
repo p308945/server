@@ -67,7 +67,7 @@ err:
 				}
 		}
 
-		bool CDbOper::Execute(SqlOperation *)
+		bool CDbOper::Execute(std::shared_ptr<SqlOperObj> obj)
 		{
 				return true;
 		}

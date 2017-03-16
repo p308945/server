@@ -20,9 +20,11 @@
 #define __DBOPER_H__
 
 #include <string>
+#include <memory>
 #include <cstdint>
 #include <mysql.h>
 #include "defmySqlType.h"
+#include "SqlOperObj.h"
 
 namespace goddard
 {
@@ -33,7 +35,7 @@ namespace goddard
 						virtual ~CDbOper() { DisConnect(); }
 						bool ConnectDB(const ConnDBConfig& cfg, std::string &errStr);
 						void DisConnect();
-						bool Execute(SqlOperation *);
+						bool Execute(std::shared_ptr<SqlOperObj>);
 
 				private:
 						MYSQL *_mysql;

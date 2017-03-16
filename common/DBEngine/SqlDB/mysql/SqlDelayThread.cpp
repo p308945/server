@@ -32,7 +32,7 @@ namespace goddard
 		void SqlDelayThread::run()
 		{
 				ThreadStart();
-				SqlOperation *s;
+				std::shared_ptr<SqlOperObj> s;
 				bool ret = false;
 				while (_running)
 				{
@@ -43,7 +43,7 @@ namespace goddard
 								if (ret)
 								{
 										_oper.Execute(s);
-										delete s;
+										addResObj(s);
 								}
 						}
 				}
