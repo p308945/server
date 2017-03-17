@@ -25,7 +25,7 @@
 
 namespace goddard
 {
-		template <typename T, typename LockType = std::timed_mutex, typename StorgeType = std::deque<T> >
+		template <typename T, typename LockType = std::timed_mutex, typename StorgeType = std::deque<T>>
 				class LockedQueue
 				{
 						public:

@@ -31,14 +31,17 @@ namespace goddard
 		class CDbOper
 		{
 				public:
-						CDbOper() : _mysql(NULL) {}
+						CDbOper() : mMySql(NULL) {}
 						virtual ~CDbOper() { DisConnect(); }
 						bool ConnectDB(const ConnDBConfig& cfg, std::string &errStr);
 						void DisConnect();
 						bool Execute(std::shared_ptr<SqlOperObj>);
 
 				private:
-						MYSQL *_mysql;
+						void getSqlResult(MYSQL_RES *result, std::shared_ptr<SqlOperObj>);
+
+				private:
+						MYSQL *mMySql;
 		};
 
 }

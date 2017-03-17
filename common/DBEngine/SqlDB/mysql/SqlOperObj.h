@@ -19,14 +19,57 @@
 #ifndef __SQLOPEROBJ_H__
 #define __SQLOPEROBJ_H__
 
+#include <vector>
+#include <list>
+#include <memory>
 #include "defmySqlType.h"
 
 namespace goddard
 {
+		using SqlResultFieldPtr = std::shared_ptr<SqlResultField>;
+		using SqlResultFieldPtrVec = std::vector<SqlResultFieldPtr>;
+		using SqlResultFieldPtrVecList = std::list<SqlResultFieldPtrVec>;
+
 		class SqlOperObj
 		{
+				public:
+						SqlOperObj() : mErrCode(DBErrCode::DB_ERR_ERR) {}
+						void setSql(const std::string &sql)
+						{
+								mSql = sql;
+						}
 
-				DBOperContex _ctx;
+						const std::string & getSql() const
+						{
+								return mSql;
+						}
+
+						void addFieldName(const std::string &name)
+						{
+								mFieldName.push_back(name);
+						}
+
+						void addResultFieldVec(const SqlResultFieldPtrVec &vec)
+						{
+								mResultList.push_back(vec);
+						}
+
+						void setErrCode(enum DBErrCode code)
+						{
+								mErrCode = code;
+						}
+
+						enum DBErrCode getErrCode() const
+						{
+								return mErrCode;
+						}
+
+				private:
+						std::string mSql;
+						DBOperContex mCtx;
+						std::vector<std::string> mFieldName;
+						SqlResultFieldPtrVecList mResultList;
+						enum DBErrCode mErrCode;
 		};
 }
 
