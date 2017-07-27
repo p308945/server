@@ -122,7 +122,7 @@ namespace goddard
 				{
 					s->running_id = id;
 					co->status = CoroutineRunning;
-					makecontext(&co->c, (void (*)())schedule_fun, 1, s);
+				//	makecontext(&co->c, (void (*)())schedule_fun, 1, s);
 					swapcontext(&s->main, &co->c);
 				}
 				break;
