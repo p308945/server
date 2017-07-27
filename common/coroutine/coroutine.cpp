@@ -99,10 +99,6 @@ namespace goddard
 
 	void coroutine_resume(schedule *s, int id)
 	{
-		if (-1 == s->running_id)
-		{
-			return;
-		}
 		if (id < 0 || id > s->max_size)
 		{
 			return;
@@ -132,7 +128,6 @@ namespace goddard
 				break;
 			default:
 				{
-
 				}
 				break;
 		}
@@ -149,6 +144,4 @@ namespace goddard
 		co->status = CoroutineSuspend;
 		swapcontext(&co->c, &s->main);
 	}
-
-
 }
