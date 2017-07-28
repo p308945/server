@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <time.h>
+#include <signal.h>
 
 using namespace goddard;
 
@@ -57,11 +58,20 @@ void fun2(void *args)
 	free(arg);
 }
 
-#define MAX_COROUTINE_SIZE 10
+#define MAX_COROUTINE_SIZE 200
+
+schedule *s = NULL;
+
+void sigHandle(int num)
+{
+	printf("xxxxxxxxxxxxxxxxxx");
+	schedule_check(s, MAX_COROUTINE_SIZE);
+	return;
+}
 
 int main()
 {
-	schedule *s = schedule_new();
+	s = schedule_new();
 	if (NULL == s)
 	{
 		return -1;
@@ -69,6 +79,7 @@ int main()
 
 	int count = 0;
 	srandom(time(NULL));
+	signal(SIGINT, sigHandle);
 
 	while (1)
 	{
@@ -90,7 +101,7 @@ int main()
 		}
 		int r = 0;
 		r = random() % count;
-		printf("coroutine_resume %d, use_count: %d\n", r, schedule_usecount(s));
+//		printf("coroutine_resume %d, use_count: %d\n", r, schedule_usecount(s));
 		coroutine_resume(s, r);
 		usleep(10);
 	}

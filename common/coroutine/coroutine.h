@@ -35,6 +35,7 @@ namespace goddard
 	schedule* schedule_new();
 	void schedule_destory(schedule *s);
 	int schedule_usecount(schedule *s);
+	void schedule_check(schedule *s, int num);
 	int coroutine_create(schedule *s, CoroutineFun fun, void *args);
 	void coroutine_resume(schedule *s, int id);
 	void coroutine_yield(schedule *s);

@@ -23,7 +23,7 @@
 
 namespace goddard
 {
-	const int DEFAULT_COROUTINE_COUNT = 10;
+	const int DEFAULT_COROUTINE_COUNT = 100;
 	const int DEFAULT_STACK_SIZE = 128 * 1024;
 
 	enum CoroutineStatus
@@ -102,6 +102,19 @@ namespace goddard
 		return s->use_count;
 	}
 
+	static coroutine *coroutine_new(CoroutineFun fun, void *args)
+	{
+		coroutine *co = (coroutine *)malloc(sizeof(coroutine));
+		if (NULL == co)
+		{
+			return NULL;
+		}
+		co->status = CoroutineDead;
+		co->fun = fun;
+		co->args = args;
+		return co;
+	}
+
 	int coroutine_create(schedule *s, CoroutineFun fun, void *args)
 	{
 		if (s->use_count < s->max_size)
@@ -112,22 +125,21 @@ namespace goddard
 				coroutine *co = s->cos[id];
 				if (NULL == co)
 				{
-					co = (coroutine *)malloc(sizeof(coroutine));
+					co = coroutine_new(fun, args);
 					if (NULL == co)
 					{
 						return -1;
 					}
 					s->cos[id] = co;
-					co->status = CoroutineDead;
 				}
 				if (CoroutineDead == co->status)
 				{
 					co->fun = fun;
 					co->args = args;
 					co->status = CoroutineReady;
-//					memset(co->stack, 0, sizeof(co->stack));
+					memset(co->stack, 0, sizeof(co->stack));
 					++s->use_count;
-					printf("use count incr %d, %d\n", s->use_count, id);
+//					printf("use count incr %d, %d\n", s->use_count, id);
 					return id;
 				}
 
@@ -145,7 +157,15 @@ namespace goddard
 			memset(s->cos + s->max_size, 0, sizeof(coroutine *) * s->max_size);
 			s->max_size *= 2;
 			++s->use_count;
-			printf("use count incr %d, %d\n", s->use_count, id);
+			coroutine *co = coroutine_new(fun, args);
+			if (NULL == co)
+			{
+				return -1;
+			}
+			co->status = CoroutineReady;
+			memset(co->stack, 0, sizeof(co->stack));
+			s->cos[id] = co;
+//			printf("use count incr %d, %d\n", s->use_count, id);
 			return id;
 		}
 		return -1;
@@ -161,7 +181,7 @@ namespace goddard
 		--s->use_count;
 //		free(co);
 //		s->cos[id] = NULL;
-		printf("use count decr %d, %d\n", s->use_count, id);
+//		printf("use count decr %d, %d\n", s->use_count, id);
 	}
 
 	void coroutine_resume(schedule *s, int id)
@@ -215,4 +235,22 @@ namespace goddard
 		co->status = CoroutineSuspend;
 		swapcontext(&co->c, &s->main);
 	}
+
+	void schedule_check(schedule *s, int num)
+	{
+		if (num > s->max_size)
+		{
+			num = s->max_size;
+		}
+		printf("schedule_check num %d\n", num);
+		for (int i = 0; i < num; ++i)
+		{
+			coroutine *co = s->cos[i];
+			if (NULL != co)
+			{
+				printf("schedule_check id: %d, status: %d\n", i, co->status);
+			}
+		}
+	}
+
 }
