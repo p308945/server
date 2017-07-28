@@ -24,6 +24,7 @@
 namespace goddard
 {
 	const int DEFAULT_COROUTINE_COUNT = 100;
+	const int MAX_COROUTINE_COUNT = 10000;
 	const int DEFAULT_STACK_SIZE = 128 * 1024;
 
 	enum CoroutineStatus
@@ -147,6 +148,10 @@ namespace goddard
 		}
 		else
 		{
+			if (s->max_size > MAX_COROUTINE_COUNT)
+			{
+				return -2;
+			}
 			coroutine **p = (coroutine **)realloc(s->cos, s->max_size * 2 * sizeof(struct coroutine *));
 			if (NULL == p)
 			{
@@ -252,5 +257,4 @@ namespace goddard
 			}
 		}
 	}
-
 }
