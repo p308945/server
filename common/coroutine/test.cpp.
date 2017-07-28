@@ -67,7 +67,7 @@ int main()
 		return -1;
 	}
 
-	int count = -1;
+	int count = 0;
 	srandom(time(NULL));
 
 	while (1)
@@ -89,10 +89,7 @@ int main()
 			}
 		}
 		int r = 0;
-		if (count > 0)
-		{
-			r = random() % (count + 2);
-		}
+		r = random() % count;
 		printf("coroutine_resume %d, use_count: %d\n", r, schedule_usecount(s));
 		coroutine_resume(s, r);
 		usleep(10);
