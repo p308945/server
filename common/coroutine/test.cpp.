@@ -20,36 +20,44 @@
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
+#include <time.h>
 
 using namespace goddard;
 
-void fun1(void *s)
+void fun1(void *args)
 {
+	arg_coroutine *arg = (arg_coroutine *)args;
 	puts("fun1 111");
-	coroutine_yield((schedule *)s);
+	coroutine_yield((schedule *)arg->s);
 	puts("fun1 222");
-	coroutine_yield((schedule *)s);
+	coroutine_yield((schedule *)arg->s);
 	puts("fun1 333");
-	coroutine_yield((schedule *)s);
+	coroutine_yield((schedule *)arg->s);
 	puts("fun1 444");
-	coroutine_yield((schedule *)s);
+	coroutine_yield((schedule *)arg->s);
 	puts("fun1 555");
+	printf("finised %d\n", arg->id);
+	free(arg);
 }
 
-void fun2(void *s)
+void fun2(void *args)
 {
 	puts("fun2 111");
-	coroutine_yield((schedule *)s);
+	arg_coroutine *arg = (arg_coroutine *)args;
+	coroutine_yield((schedule *)arg->s);
 	puts("fun2 222");
-	coroutine_yield((schedule *)s);
+	coroutine_yield((schedule *)arg->s);
 	puts("fun2 333");
-	coroutine_yield((schedule *)s);
+	coroutine_yield((schedule *)arg->s);
 	puts("fun2 444");
-	coroutine_yield((schedule *)s);
+	coroutine_yield((schedule *)arg->s);
 	puts("fun2 555");
+
+	printf("finised %d\n", arg->id);
+	free(arg);
 }
 
-#define MAX_COROUTINE_SIZE 10000
+#define MAX_COROUTINE_SIZE 10
 
 int main()
 {
@@ -60,21 +68,39 @@ int main()
 	}
 
 	int count = -1;
+	srandom(time(NULL));
 
 	while (1)
 	{
 		if (count < MAX_COROUTINE_SIZE)
 		{
-			printf("create %d, count: %d\n", coroutine_create(s, fun1, (void *)s), count);
 			++count;
+			arg_coroutine *arg = (arg_coroutine*)malloc(sizeof(arg_coroutine));
+			arg->s = s;
+			arg->id = count;
+			printf("create %d, count: %d\n", coroutine_create(s, fun1, (void *)arg), count);
+		}
+		else
+		{
+			if (0 == schedule_usecount(s))
+			{
+				schedule_destory(s);
+				break;
+			}
 		}
 		int r = 0;
 		if (count > 0)
 		{
-			r = random() % count;
+			r = random() % (count + 2);
+			if (11 == r)
+			{
+				printf("----------------\n");
+			}
 		}
-		printf("coroutine_resume %d\n", r);
+		printf("coroutine_resume %d, use_count: %d\n", r, schedule_usecount(s));
 		coroutine_resume(s, r);
-		usleep(100);
+		usleep(10);
 	}
+	puts("finished\n");
+	getchar();
 }

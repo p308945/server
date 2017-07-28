@@ -18,6 +18,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <cstdio>
 #include "coroutine.h"
 
 namespace goddard
@@ -96,6 +97,11 @@ namespace goddard
 		free(s);
 	}
 
+	int schedule_usecount(schedule *s)
+	{
+		return s->use_count;
+	}
+
 	int coroutine_create(schedule *s, CoroutineFun fun, void *args)
 	{
 		if (s->use_count < s->max_size)
@@ -121,6 +127,7 @@ namespace goddard
 					co->status = CoroutineReady;
 //					memset(co->stack, 0, sizeof(co->stack));
 					++s->use_count;
+					printf("use count incr %d, %d\n", s->use_count, id);
 					return id;
 				}
 
@@ -138,6 +145,7 @@ namespace goddard
 			memset(s->cos + s->max_size, 0, sizeof(coroutine *) * s->max_size);
 			s->max_size *= 2;
 			++s->use_count;
+			printf("use count incr %d, %d\n", s->use_count, id);
 			return id;
 		}
 		return -1;
@@ -151,6 +159,9 @@ namespace goddard
 		co->status = CoroutineDead;
 		s->running_id = -1;
 		--s->use_count;
+		free(co);
+		s->cos[id] = NULL;
+		printf("use count decr %d, %d\n", s->use_count, id);
 	}
 
 	void coroutine_resume(schedule *s, int id)

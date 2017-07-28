@@ -26,8 +26,15 @@ namespace goddard
 	struct schedule;
 	typedef void(*CoroutineFun)(void *);
 
+	struct arg_coroutine
+	{
+		schedule *s;
+		int id;
+	};
+
 	schedule* schedule_new();
 	void schedule_destory(schedule *s);
+	int schedule_usecount(schedule *s);
 	int coroutine_create(schedule *s, CoroutineFun fun, void *args);
 	void coroutine_resume(schedule *s, int id);
 	void coroutine_yield(schedule *s);
