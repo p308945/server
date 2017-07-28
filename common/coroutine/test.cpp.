@@ -39,6 +39,7 @@ void fun1(void *args)
 	puts("fun1 555");
 	printf("finised %d\n", arg->id);
 	free(arg);
+	//coroutine_del(arg->s, arg->id);
 }
 
 void fun2(void *args)
@@ -58,7 +59,7 @@ void fun2(void *args)
 	free(arg);
 }
 
-#define MAX_COROUTINE_SIZE 200
+#define MAX_COROUTINE_SIZE 100
 
 schedule *s = NULL;
 

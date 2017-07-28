@@ -1,4 +1,4 @@
-CXXFLAGS= -Wall -g -Wno-deprecated -std=c++0x -Wno-unused-function -shared -fPIC
+CXXFLAGS= -Wall -g -Wno-deprecated -std=c++0x -Wno-unused-function -shared -fPIC -static-libasan -fsanitize=leak
 TARGET=libCoroutine.so
 CXX=g++
 INCLUDE_DIR= -I ../../../util

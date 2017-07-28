@@ -23,7 +23,7 @@
 
 namespace goddard
 {
-	const int DEFAULT_COROUTINE_COUNT = 100;
+	const int DEFAULT_COROUTINE_COUNT = 2000;
 	const int MAX_COROUTINE_COUNT = 10000;
 	const int DEFAULT_STACK_SIZE = 128 * 1024;
 
@@ -255,6 +255,20 @@ namespace goddard
 			{
 				printf("schedule_check id: %d, status: %d\n", i, co->status);
 			}
+		}
+	}
+
+	void coroutine_del(schedule *s, int id)
+	{
+		if (id < 0 || id >= s->max_size)
+		{
+			return;
+		}
+		coroutine *co = s->cos[id];
+		if (NULL != co)
+		{
+			free(co);
+			s->cos[id] = NULL;
 		}
 	}
 }
