@@ -92,10 +92,6 @@ int main()
 		if (count > 0)
 		{
 			r = random() % (count + 2);
-			if (11 == r)
-			{
-				printf("----------------\n");
-			}
 		}
 		printf("coroutine_resume %d, use_count: %d\n", r, schedule_usecount(s));
 		coroutine_resume(s, r);

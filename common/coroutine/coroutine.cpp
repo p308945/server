@@ -159,8 +159,8 @@ namespace goddard
 		co->status = CoroutineDead;
 		s->running_id = -1;
 		--s->use_count;
-		free(co);
-		s->cos[id] = NULL;
+//		free(co);
+//		s->cos[id] = NULL;
 		printf("use count decr %d, %d\n", s->use_count, id);
 	}
 
