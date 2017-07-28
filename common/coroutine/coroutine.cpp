@@ -42,7 +42,7 @@ namespace goddard
 	{
 		if (NULL != s->cos)
 		{
-			delete s->cos;
+			free(s->cos);
 			s->cos = NULL;
 		}
 		s->running_id = -1;
@@ -99,7 +99,7 @@ namespace goddard
 
 	void coroutine_resume(schedule *s, int id)
 	{
-		if (id < 0 || id > s->max_size)
+		if (id < 0 || id >= s->max_size)
 		{
 			return;
 		}
