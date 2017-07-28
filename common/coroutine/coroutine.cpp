@@ -45,7 +45,7 @@ namespace goddard
 	struct schedule
 	{
 		ucontext main;
-		coroutine *cos;
+		coroutine **cos;
 		int running_id;
 		int use_count;
 		int max_size;
@@ -57,16 +57,12 @@ namespace goddard
 		s->running_id = -1;
 		s->use_count = 0;
 		s->max_size = DEFAULT_COROUTINE_COUNT;
-		s->cos = (coroutine *)malloc(sizeof(coroutine) * s->max_size);
+		s->cos = (coroutine **)malloc(sizeof(coroutine *) * s->max_size);
 		if (NULL == s->cos)
 		{
 			return false;
 		}
-//		memset(s->cos, 0, sizeof(coroutine) * s->max_size);
-		for (int i = 0; i < s->max_size; ++i)
-		{
-			s->cos[i].status = CoroutineDead;
-		}
+		memset(s->cos, 0, sizeof(coroutine *) * s->max_size);
 		return true;
 	}
 
@@ -88,14 +84,15 @@ namespace goddard
 		{
 			return;
 		}
-		if (NULL != s->cos)
+		for (int i = 0; i < s->max_size; ++i)
 		{
-			free(s->cos);
-			s->cos = NULL;
+			coroutine *co = s->cos[i];
+			if (NULL != co)
+			{
+				free(co);
+			}
 		}
-		s->running_id = -1;
-		s->use_count = 0;
-		s->max_size = DEFAULT_COROUTINE_COUNT;
+		free(s->cos);
 		free(s);
 	}
 
@@ -106,9 +103,19 @@ namespace goddard
 			for (int i = 0; i < s->max_size; ++i)
 			{
 				int id = (i + s->use_count) % s->max_size;
-				if (CoroutineDead == s->cos[id].status)
+				coroutine *co = s->cos[id];
+				if (NULL == co)
 				{
-					coroutine *co = &s->cos[id];
+					co = (coroutine *)malloc(sizeof(coroutine));
+					if (NULL == co)
+					{
+						return -1;
+					}
+					s->cos[id] = co;
+					co->status = CoroutineDead;
+				}
+				if (CoroutineDead == co->status)
+				{
 					co->fun = fun;
 					co->args = args;
 					co->status = CoroutineReady;
@@ -121,14 +128,14 @@ namespace goddard
 		}
 		else
 		{
-			coroutine *p = (coroutine *)realloc(s->cos, s->max_size * 2 * sizeof(struct coroutine));
+			coroutine **p = (coroutine **)realloc(s->cos, s->max_size * 2 * sizeof(struct coroutine *));
 			if (NULL == p)
 			{
 				return -1;
 			}
 			int id = s->max_size;
 			s->cos = p;
-			memset(s->cos + s->max_size, 0, sizeof(coroutine) * s->max_size);
+			memset(s->cos + s->max_size, 0, sizeof(coroutine *) * s->max_size);
 			s->max_size *= 2;
 			++s->use_count;
 			return id;
@@ -139,7 +146,7 @@ namespace goddard
 	static void schedule_fun(schedule *s)
 	{
 		int id = s->running_id;
-		coroutine *co = &s->cos[id];
+		coroutine *co = s->cos[id];
 		co->fun(co->args);
 		co->status = CoroutineDead;
 		s->running_id = -1;
@@ -152,7 +159,7 @@ namespace goddard
 		{
 			return;
 		}
-		coroutine *co = &s->cos[id];
+		coroutine *co = s->cos[id];
 		switch(co->status)
 		{
 			case CoroutineReady:
@@ -188,7 +195,7 @@ namespace goddard
 		{
 			return;
 		}
-		coroutine *co = &s->cos[s->running_id];
+		coroutine *co = s->cos[s->running_id];
 		s->running_id = -1;
 		co->status = CoroutineSuspend;
 		swapcontext(&co->c, &s->main);
