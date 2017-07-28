@@ -24,7 +24,7 @@
 namespace goddard
 {
 	const int DEFAULT_COROUTINE_COUNT = 10;
-	const int DEFAULT_STACK_SIZE = 1 * 1024 * 1024;
+	const int DEFAULT_STACK_SIZE = 128 * 1024;
 	typedef void(*CoroutineFun)(void *);
 
 	enum CoroutineStatus

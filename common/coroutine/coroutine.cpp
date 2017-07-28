@@ -34,7 +34,11 @@ namespace goddard
 		{
 			return false;
 		}
-		memset(s->cos, 0, sizeof(coroutine) * s->max_size);
+//		memset(s->cos, 0, sizeof(coroutine) * s->max_size);
+		for (int i = 0; i < s->max_size; ++i)
+		{
+			s->cos[i].status = CoroutineDead;
+		}
 		return true;
 	}
 
@@ -63,7 +67,7 @@ namespace goddard
 					co->fun = fun;
 					co->args = args;
 					co->status = CoroutineReady;
-					memset(co->stack, 0, sizeof(co->stack));
+//					memset(co->stack, 0, sizeof(co->stack));
 					++s->use_count;
 					return id;
 				}
@@ -111,6 +115,7 @@ namespace goddard
 					getcontext(&co->c);
 					co->c.uc_stack.ss_sp = co->stack;
 					co->c.uc_stack.ss_size = sizeof(co->stack);
+					co->c.uc_flags = 0;
 					co->c.uc_link = &s->main;
 					s->running_id = id;
 					co->status = CoroutineRunning;
