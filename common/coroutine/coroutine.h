@@ -23,37 +23,10 @@
 
 namespace goddard
 {
-	const int DEFAULT_COROUTINE_COUNT = 10;
-	const int DEFAULT_STACK_SIZE = 128 * 1024;
+	struct schedule;
 	typedef void(*CoroutineFun)(void *);
 
-	enum CoroutineStatus
-	{
-		CoroutineDead = 0,
-		CoroutineReady,
-		CoroutineRunning,
-		CoroutineSuspend,
-	};
-
-	struct coroutine
-	{
-		ucontext c;
-		CoroutineFun fun;
-		void *args;
-		CoroutineStatus status;
-		char stack[DEFAULT_STACK_SIZE];
-	};
-
-	struct schedule
-	{
-		ucontext main;
-		coroutine *cos;
-		int running_id;
-		int use_count;
-		int max_size;
-	};
-
-	bool schedule_init(schedule *s);
+	schedule* schedule_new();
 	void schedule_destory(schedule *s);
 	int coroutine_create(schedule *s, CoroutineFun fun, void *args);
 	void coroutine_resume(schedule *s, int id);

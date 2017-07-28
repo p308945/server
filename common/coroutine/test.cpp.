@@ -53,8 +53,11 @@ void fun2(void *s)
 
 int main()
 {
-	schedule s;
-	schedule_init(&s);
+	schedule *s = schedule_new();
+	if (NULL == s)
+	{
+		return -1;
+	}
 
 	int count = 0;
 
@@ -62,12 +65,12 @@ int main()
 	{
 		if (count < MAX_COROUTINE_SIZE)
 		{
-			coroutine_create(&s, fun1, (void *)&s);
+			coroutine_create(s, fun1, (void *)s);
 			++count;
 		}
 		int r = random() % count;
 		printf("coroutine_resume %d\n", r);
-		coroutine_resume(&s, r);
+		coroutine_resume(s, r);
 		usleep(100);
 	}
 }

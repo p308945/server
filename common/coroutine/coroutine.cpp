@@ -22,8 +22,36 @@
 
 namespace goddard
 {
+	const int DEFAULT_COROUTINE_COUNT = 10;
+	const int DEFAULT_STACK_SIZE = 128 * 1024;
 
-	bool schedule_init(schedule *s)
+	enum CoroutineStatus
+	{
+		CoroutineDead = 0,
+		CoroutineReady,
+		CoroutineRunning,
+		CoroutineSuspend,
+	};
+
+	struct coroutine
+	{
+		ucontext c;
+		CoroutineFun fun;
+		void *args;
+		CoroutineStatus status;
+		char stack[DEFAULT_STACK_SIZE];
+	};
+
+	struct schedule
+	{
+		ucontext main;
+		coroutine *cos;
+		int running_id;
+		int use_count;
+		int max_size;
+	};
+
+	static bool schedule_init(schedule *s)
 	{
 		s->cos = NULL;
 		s->running_id = -1;
@@ -42,8 +70,24 @@ namespace goddard
 		return true;
 	}
 
+	schedule* schedule_new()
+	{
+		schedule *s = (schedule *)malloc(sizeof(schedule));
+		if (schedule_init(s))
+		{
+			return s;
+		}
+		schedule_destory(s);
+		return NULL;
+	}
+
+
 	void schedule_destory(schedule *s)
 	{
+		if (NULL == s)
+		{
+			return;
+		}
 		if (NULL != s->cos)
 		{
 			free(s->cos);
@@ -52,6 +96,7 @@ namespace goddard
 		s->running_id = -1;
 		s->use_count = 0;
 		s->max_size = DEFAULT_COROUTINE_COUNT;
+		free(s);
 	}
 
 	int coroutine_create(schedule *s, CoroutineFun fun, void *args)
