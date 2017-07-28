@@ -160,6 +160,10 @@ namespace goddard
 			return;
 		}
 		coroutine *co = s->cos[id];
+		if (NULL == co)
+		{
+			return;
+		}
 		switch(co->status)
 		{
 			case CoroutineReady:

@@ -59,16 +59,20 @@ int main()
 		return -1;
 	}
 
-	int count = 0;
+	int count = -1;
 
 	while (1)
 	{
 		if (count < MAX_COROUTINE_SIZE)
 		{
-			coroutine_create(s, fun1, (void *)s);
+			printf("create %d, count: %d\n", coroutine_create(s, fun1, (void *)s), count);
 			++count;
 		}
-		int r = random() % count;
+		int r = 0;
+		if (count > 0)
+		{
+			r = random() % count;
+		}
 		printf("coroutine_resume %d\n", r);
 		coroutine_resume(s, r);
 		usleep(100);
