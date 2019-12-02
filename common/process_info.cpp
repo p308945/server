@@ -114,7 +114,7 @@ struct stProcCpuInfo
 	}
 };
 
-int GetCpuUseInfo(int &cpuPercent)
+bool GetCpuUseInfo(int &cpuPercent)
 {
 	static stTotalCpuInfo lastTotalCpuInfo;
 	static stProcCpuInfo lastProcCpuInfo;
