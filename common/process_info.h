@@ -25,6 +25,6 @@ struct stMemInfo
 
 bool GetMemInfo(stMemInfo &info);
 
-int GetCpuUseInfo(int &cpuPercent);
+bool GetCpuUseInfo(int &cpuPercent);
 
 #endif
