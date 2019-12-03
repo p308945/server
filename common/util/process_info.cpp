@@ -154,13 +154,24 @@ bool GetCpuUseInfo(int &cpuPercent)
 	{
 		return false;
 	}
-	long cores = sysconf(_SC_NPROCESSORS_CONF);
+	static int cores = 0;
+	FILE *fp = popen("cat /proc/cpuinfo | grep processor | wc -l", "r");
+	if (NULL != fp && 0 == cores)
+	{
+		char buf[21] = {0};
+		fread(buf, 1, sizeof(buf), fp);
+		if (feof(fp))
+		{
+			cores = ::atoi(buf);
+		}
+		pclose(fp);
+	}
 	int deltProc = procCpuInfo - lastProcCpuInfo;
 	int deltTotal = totalCpuInfo - lastTotalCpuInfo;
 	if (0 == deltTotal)
 	{
 		cpuPercent = 0;
-		LOG_ERROR("GetCpuUseInfo fail deltTotal == 0 %d %ld info :", deltProc, cores);
+		LOG_ERROR("GetCpuUseInfo fail deltTotal == 0 %d %d info :", deltProc, cores);
 		procCpuInfo.LogError("procCpuInfo");
 		lastProcCpuInfo.LogError("lastProcCpuInfo");
 		totalCpuInfo.LogError("totalCpuInfo");
@@ -168,8 +179,8 @@ bool GetCpuUseInfo(int &cpuPercent)
 	}
 	else
 	{
-		cpuPercent = 100 * cores * deltProc / deltTotal;
-		LOG_DEBUG("GetCpuUseInfo succ %d %d %d %ldinfo:", cpuPercent, deltProc, deltTotal, cores);
+		cpuPercent = 100 * (cores > 0 ? cores : 1) * deltProc / deltTotal;
+		LOG_DEBUG("GetCpuUseInfo succ %d %d %d %d info:", cpuPercent, deltProc, deltTotal, cores);
 		procCpuInfo.LogDebug("procCpuInfo");
 		lastProcCpuInfo.LogDebug("lastProcCpuInfo");
 		totalCpuInfo.LogDebug("totalCpuInfo");
