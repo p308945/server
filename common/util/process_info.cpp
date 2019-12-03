@@ -164,8 +164,6 @@ bool GetCpuUseInfo(int &cpuPercent)
 		lastProcCpuInfo.LogError("lastProcCpuInfo");
 		totalCpuInfo.LogError("totalCpuInfo");
 		lastTotalCpuInfo.LogError("lastTotalCpuInfo");
-		lastProcCpuInfo = procCpuInfo;
-		lastTotalCpuInfo = totalCpuInfo;
 	}
 	else
 	{
@@ -175,8 +173,8 @@ bool GetCpuUseInfo(int &cpuPercent)
 		lastProcCpuInfo.LogDebug("lastProcCpuInfo");
 		totalCpuInfo.LogDebug("totalCpuInfo");
 		lastTotalCpuInfo.LogDebug("lastTotalCpuInfo");
-		lastProcCpuInfo = procCpuInfo;
-		lastTotalCpuInfo = totalCpuInfo;
 	}
+	lastProcCpuInfo = procCpuInfo;
+	lastTotalCpuInfo = totalCpuInfo;
 	return true;
 }
