@@ -154,12 +154,13 @@ bool GetCpuUseInfo(int &cpuPercent)
 	{
 		return false;
 	}
+	long cores = sysconf(_SC_NPROCESSORS_CONF);
 	int deltProc = procCpuInfo - lastProcCpuInfo;
 	int deltTotal = totalCpuInfo - lastTotalCpuInfo;
 	if (0 == deltTotal)
 	{
 		cpuPercent = 0;
-		LOG_ERROR("GetCpuUseInfo fail deltTotal == 0 %d info :", deltProc);
+		LOG_ERROR("GetCpuUseInfo fail deltTotal == 0 %d %ld info :", deltProc, cores);
 		procCpuInfo.LogError("procCpuInfo");
 		lastProcCpuInfo.LogError("lastProcCpuInfo");
 		totalCpuInfo.LogError("totalCpuInfo");
@@ -167,8 +168,8 @@ bool GetCpuUseInfo(int &cpuPercent)
 	}
 	else
 	{
-		cpuPercent = 100 * deltProc / deltTotal;
-		LOG_DEBUG("GetCpuUseInfo succ %d %d %d info:", cpuPercent, deltProc, deltTotal);
+		cpuPercent = 100 * cores * deltProc / deltTotal;
+		LOG_DEBUG("GetCpuUseInfo succ %d %d %d %ldinfo:", cpuPercent, deltProc, deltTotal, cores);
 		procCpuInfo.LogDebug("procCpuInfo");
 		lastProcCpuInfo.LogDebug("lastProcCpuInfo");
 		totalCpuInfo.LogDebug("totalCpuInfo");
