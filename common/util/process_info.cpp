@@ -155,16 +155,19 @@ bool GetCpuUseInfo(int &cpuPercent)
 		return false;
 	}
 	static int cores = 0;
-	FILE *fp = popen("cat /proc/cpuinfo | grep processor | wc -l", "r");
-	if (NULL != fp && 0 == cores)
+	if (0 == cores)
 	{
-		char buf[21] = {0};
-		fread(buf, 1, sizeof(buf), fp);
-		if (feof(fp))
+		FILE *fp = popen("cat /proc/cpuinfo | grep processor | wc -l", "r");
+		if (NULL != fp)
 		{
-			cores = ::atoi(buf);
+			char buf[21] = {0};
+			fread(buf, 1, sizeof(buf), fp);
+			if (feof(fp))
+			{
+				cores = ::atoi(buf);
+			}
+			pclose(fp);
 		}
-		pclose(fp);
 	}
 	int deltProc = procCpuInfo - lastProcCpuInfo;
 	int deltTotal = totalCpuInfo - lastTotalCpuInfo;
